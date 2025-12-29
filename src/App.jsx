@@ -12,14 +12,14 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   React.useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn");
+    const loggedIn = sessionStorage.getItem("isLoggedIn");
     if (loggedIn === "true") {
       setIsAuthenticated(true);
     }
   }, []);
 
   const handleLogin = () => {
-    localStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("isLoggedIn", "true");
     setIsAuthenticated(true);
   };
 
