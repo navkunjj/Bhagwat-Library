@@ -1,7 +1,7 @@
-import React from "react";
-import { X, Save, Edit2 } from "lucide-react";
+import { X, Save, Edit2, Camera } from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches } from "../utils/store";
+import { CameraCapture } from "./CameraCapture";
 
 export const StudentForm = ({
   student,
@@ -10,6 +10,7 @@ export const StudentForm = ({
   mode = "personal",
 }) => {
   const [batches, setBatches] = React.useState([]);
+  const [isCameraOpen, setIsCameraOpen] = React.useState(false);
 
   // Load batches first
   React.useEffect(() => {
@@ -129,36 +130,60 @@ export const StudentForm = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Personal Mode: Photo Upload. Payment Mode: Read-only Photo */}
+          {/* Personal Mode: Photo Upload & Camera. Payment Mode: Read-only Photo */}
           <div className="flex justify-center mb-4">
-            <div
-              className={`relative ${
-                mode === "personal" ? "group cursor-pointer" : ""
-              } w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center`}
-            >
+            <div className="relative group">
+              <div
+                className={clsx(
+                  "w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all",
+                  mode === "personal" && "group-hover:border-primary/50"
+                )}
+              >
+                {formData.photo ? (
+                  <img
+                    src={formData.photo}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-slate-400 dark:text-gray-400 text-xs text-center px-2">
+                    {mode === "personal" ? "No Photo" : "No Photo"}
+                  </div>
+                )}
+
+                {mode === "personal" && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex flex-col items-center gap-1">
+                      <Edit2 size={16} className="text-white" />
+                      <span className="text-[10px] text-white font-medium">
+                        Change
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {mode === "personal" && (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-              )}
-              {formData.photo ? (
-                <img
-                  src={formData.photo}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-slate-400 dark:text-gray-400 text-xs text-center px-2">
-                  {mode === "personal" ? "Upload Photo" : "No Photo"}
-                </div>
-              )}
-              {mode === "personal" && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Edit2 size={24} className="text-white bg-transparent" />
-                </div>
+                <>
+                  {/* File Upload Hidden Input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    title="Upload from computer"
+                  />
+
+                  {/* Camera Quick Action */}
+                  <button
+                    type="button"
+                    onClick={() => setIsCameraOpen(true)}
+                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg border-2 border-white dark:border-[#1e293b] hover:scale-110 active:scale-95 transition-all z-20"
+                    title="Take photo with camera"
+                  >
+                    <Camera size={14} />
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -338,6 +363,13 @@ export const StudentForm = ({
           </div>
         </form>
       </div>
+
+      {isCameraOpen && (
+        <CameraCapture
+          onCapture={(photo) => setFormData((prev) => ({ ...prev, photo }))}
+          onClose={() => setIsCameraOpen(false)}
+        />
+      )}
     </div>
   );
 };

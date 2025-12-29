@@ -1,0 +1,143 @@
+import React from "react";
+import { Camera, RefreshCw, Check, X } from "lucide-react";
+
+export const CameraCapture = ({ onCapture, onClose }) => {
+  const videoRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+  const [stream, setStream] = React.useState(null);
+  const [preview, setPreview] = React.useState(null);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+      setStream(mediaStream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      setError(
+        "Could not access camera. Please ensure permissions are granted."
+      );
+    }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+
+      // Set canvas size to video size
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Draw frame to canvas
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert to base64
+      const imageData = canvas.toDataURL("image/jpeg", 0.8);
+      setPreview(imageData);
+      stopCamera();
+    }
+  };
+
+  const handleRetake = () => {
+    setPreview(null);
+    startCamera();
+  };
+
+  const handleUsePhoto = () => {
+    onCapture(preview);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-[#1e293b] w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl transition-colors duration-300">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between">
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Camera size={20} />
+            Capture Student Photo
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Camera/Preview Area */}
+        <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
+          {error ? (
+            <div className="text-white text-center p-6 bg-danger/20 rounded-xl m-4">
+              <p>{error}</p>
+            </div>
+          ) : preview ? (
+            <img
+              src={preview}
+              alt="Captured"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          )}
+          <canvas ref={canvasRef} className="hidden" />
+        </div>
+
+        {/* Actions */}
+        <div className="p-6 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/5">
+          {preview ? (
+            <div className="flex gap-4">
+              <button
+                onClick={handleRetake}
+                className="flex-1 bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-white/20 transition-all"
+              >
+                <RefreshCw size={18} />
+                Retake
+              </button>
+              <button
+                onClick={handleUsePhoto}
+                className="flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
+              >
+                <Check size={18} />
+                Use Photo
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={capturePhoto}
+              disabled={!!error}
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+            >
+              <div className="w-4 h-4 rounded-full bg-white animate-pulse" />
+              Capture Photo
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
