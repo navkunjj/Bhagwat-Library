@@ -69,8 +69,10 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
               <School size={24} />
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-tight">Self Study</h1>
-              <p className="text-xs text-gray-500">Admin Center</p>
+              <h1 className="font-bold text-lg leading-tight">
+                Bhagwat Library
+              </h1>
+              <p className="text-xs text-gray-500">Admin </p>
             </div>
           </div>
 
