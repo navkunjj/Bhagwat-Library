@@ -1,5 +1,6 @@
 import React from "react";
-import { Camera, RefreshCw, Check, X } from "lucide-react";
+import { Camera, RefreshCw, Check, X, RotateCcw } from "lucide-react";
+import { clsx } from "clsx";
 
 export const CameraCapture = ({ onCapture, onClose }) => {
   const videoRef = React.useRef(null);
@@ -8,11 +9,12 @@ export const CameraCapture = ({ onCapture, onClose }) => {
   const [preview, setPreview] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [facingMode, setFacingMode] = React.useState("user"); // "user" or "environment"
 
   React.useEffect(() => {
-    startCamera();
+    startCamera(facingMode);
     return () => stopCamera();
-  }, []);
+  }, [facingMode]);
 
   React.useEffect(() => {
     if (stream && videoRef.current) {
@@ -20,13 +22,14 @@ export const CameraCapture = ({ onCapture, onClose }) => {
     }
   }, [stream]);
 
-  const startCamera = async () => {
+  const startCamera = async (mode) => {
+    stopCamera(); // Ensure previous stream is stopped
     setLoading(true);
     setError(null);
     try {
       const constraints = {
         video: {
-          facingMode: "user",
+          facingMode: mode,
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
@@ -75,9 +78,11 @@ export const CameraCapture = ({ onCapture, onClose }) => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      // Flip context horizontally to match mirrored preview
-      context.translate(canvas.width, 0);
-      context.scale(-1, 1);
+      // Flip context horizontally ONLY if using front camera to match mirrored preview
+      if (facingMode === "user") {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+      }
 
       // Draw frame to canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -94,7 +99,12 @@ export const CameraCapture = ({ onCapture, onClose }) => {
 
   const handleRetake = () => {
     setPreview(null);
-    startCamera();
+    // startCamera is triggered by useEffect on facingMode if we keep it, but here it's already current
+    startCamera(facingMode);
+  };
+
+  const switchCamera = () => {
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
   };
 
   const handleUsePhoto = () => {
@@ -111,12 +121,23 @@ export const CameraCapture = ({ onCapture, onClose }) => {
             <Camera size={20} />
             Capture Student Photo
           </h3>
-          <button
-            onClick={onClose}
-            className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            {!preview && !error && (
+              <button
+                onClick={switchCamera}
+                className="p-2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                title="Switch Camera"
+              >
+                <RotateCcw size={20} />
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Camera/Preview Area */}
@@ -144,7 +165,10 @@ export const CameraCapture = ({ onCapture, onClose }) => {
                 playsInline
                 muted
                 onLoadedMetadata={() => videoRef.current?.play()}
-                className="w-full h-full object-cover -scale-x-100"
+                className={clsx(
+                  "w-full h-full object-cover",
+                  facingMode === "user" && "-scale-x-100"
+                )}
               />
             </>
           )}
