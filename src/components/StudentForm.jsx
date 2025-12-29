@@ -1,3 +1,4 @@
+import React from "react";
 import { X, Save, Edit2, Camera } from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches } from "../utils/store";
