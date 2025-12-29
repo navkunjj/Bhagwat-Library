@@ -1,5 +1,5 @@
 import React from "react";
-import { Camera, RefreshCw, Check, X, FlipHorizontal } from "lucide-react";
+import { Camera, RefreshCw, Check, X } from "lucide-react";
 
 export const CameraCapture = ({ onCapture, onClose }) => {
   const videoRef = React.useRef(null);
@@ -8,25 +8,15 @@ export const CameraCapture = ({ onCapture, onClose }) => {
   const [preview, setPreview] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const [facingMode, setFacingMode] = React.useState("environment"); // Default to back camera as requested
 
   React.useEffect(() => {
     startCamera();
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [facingMode]);
+    return () => stopCamera();
+  }, []);
 
-  // Separate effect for attaching stream to video element
   React.useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
-      videoRef.current.onloadedmetadata = () => {
-        videoRef.current?.play().catch(console.error);
-        setLoading(false);
-      };
     }
   }, [stream]);
 
@@ -34,32 +24,35 @@ export const CameraCapture = ({ onCapture, onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      // Cleanup previous stream tracks
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
+      const constraints = {
         video: {
-          facingMode: { ideal: facingMode },
+          facingMode: "user",
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
         audio: false,
-      });
+      };
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
       setStream(mediaStream);
+      setLoading(false);
     } catch (err) {
-      console.error("Primary camera error:", err);
+      console.error("Error accessing camera with constraints:", err);
       try {
-        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+        // Fallback to basic video if complex constraints fail
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
-          audio: false,
         });
-        setStream(fallbackStream);
+        setStream(mediaStream);
+        setLoading(false);
       } catch (fallbackErr) {
-        console.error("Final camera error:", fallbackErr);
+        console.error(
+          "Error accessing camera even with fallback:",
+          fallbackErr
+        );
         setError(
-          "Camera access failed. Ensure permissions are granted and you are on a secure (HTTPS) site."
+          "Could not access camera. Please ensure permissions are granted and you are using a secure connection (HTTPS)."
         );
         setLoading(false);
       }
@@ -69,7 +62,6 @@ export const CameraCapture = ({ onCapture, onClose }) => {
   const stopCamera = () => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
     }
   };
 
@@ -83,23 +75,11 @@ export const CameraCapture = ({ onCapture, onClose }) => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      // Handle mirroring in the capture
-      if (facingMode === "user") {
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-      }
-
       // Draw frame to canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       // Convert to base64
       const imageData = canvas.toDataURL("image/jpeg", 0.8);
-
-      // If front camera, we might want to manually flip the resulting image data
-      // but usually the user wants the "stable" view they see.
-      // If the user says "opposite direction", they mean the mirror effect.
-      // We will handle the mirror effect via CSS on the video element.
-
       setPreview(imageData);
       stopCamera();
     }
@@ -124,30 +104,12 @@ export const CameraCapture = ({ onCapture, onClose }) => {
             <Camera size={20} />
             Capture Student Photo
           </h3>
-          <div className="flex items-center gap-2">
-            {!preview && !error && (
-              <button
-                onClick={() =>
-                  setFacingMode((prev) =>
-                    prev === "user" ? "environment" : "user"
-                  )
-                }
-                className="p-2 text-slate-400 dark:text-gray-400 hover:text-primary transition-colors flex items-center gap-2 text-sm font-medium"
-                title="Switch Camera"
-              >
-                <FlipHorizontal size={20} />
-                <span className="hidden sm:inline">
-                  {facingMode === "user" ? "Back" : "Front"}
-                </span>
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <X size={24} />
+          </button>
         </div>
 
         {/* Camera/Preview Area */}
@@ -175,10 +137,7 @@ export const CameraCapture = ({ onCapture, onClose }) => {
                 playsInline
                 muted
                 onLoadedMetadata={() => videoRef.current?.play()}
-                className={clsx(
-                  "w-full h-full object-cover",
-                  facingMode === "user" && "scale-x-[-1]" // Only mirror front camera
-                )}
+                className="w-full h-full object-cover"
               />
             </>
           )}
