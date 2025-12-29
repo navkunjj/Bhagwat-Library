@@ -15,47 +15,43 @@ export const CameraCapture = ({ onCapture, onClose }) => {
     return () => stopCamera();
   }, [facingMode]);
 
-  React.useEffect(() => {
-    if (stream && videoRef.current) {
-      videoRef.current.srcObject = stream;
-    }
-  }, [stream]);
-
   const startCamera = async () => {
     setLoading(true);
     setError(null);
     try {
-      stopCamera(); // Stop previous stream before starting new one
-      const constraints = {
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
+      // Manual cleanup before starting new
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = videoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: facingMode },
         audio: false,
-      };
-      const mediaStream = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play().catch((e) => console.error("Play error:", e));
+          setLoading(false);
+        };
+      }
       setStream(mediaStream);
-      setLoading(false);
     } catch (err) {
-      console.error("Error accessing camera with constraints:", err);
+      console.error("Camera error:", err);
       try {
-        // Fallback to basic video if complex constraints fail
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          setLoading(false);
+        }
         setStream(mediaStream);
-        setLoading(false);
       } catch (fallbackErr) {
-        console.error(
-          "Error accessing camera even with fallback:",
-          fallbackErr
-        );
-        setError(
-          "Could not access camera. Please ensure permissions are granted and you are using a secure connection (HTTPS)."
-        );
+        setError("Camera access failed. Check permissions and HTTPS.");
         setLoading(false);
       }
     }
@@ -64,6 +60,10 @@ export const CameraCapture = ({ onCapture, onClose }) => {
   const stopCamera = () => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
   };
 
