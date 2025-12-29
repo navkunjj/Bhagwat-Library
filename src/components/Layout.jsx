@@ -7,10 +7,12 @@ import {
   Menu,
   X,
   School,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { clsx } from "clsx";
 
-const SidebarItem = ({ icon, label, active, onClick }) => {
+const SidebarItem = ({ icon, label, active, onClick, theme }) => {
   const Icon = icon;
   return (
     <button
@@ -19,21 +21,33 @@ const SidebarItem = ({ icon, label, active, onClick }) => {
         "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-all duration-200 group",
         active
           ? "bg-primary/10 text-primary border-r-2 border-primary"
-          : "text-gray-400 hover:bg-white/5 hover:text-white"
+          : theme === "dark"
+          ? "text-gray-400 hover:bg-white/5 hover:text-white"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       )}
     >
       <Icon
         size={20}
-        className={
-          active ? "text-primary" : "text-gray-400 group-hover:text-white"
-        }
+        className={clsx(
+          active
+            ? "text-primary"
+            : theme === "dark"
+            ? "text-gray-400 group-hover:text-white"
+            : "text-slate-500 group-hover:text-slate-900"
+        )}
       />
       <span className="font-medium">{label}</span>
     </button>
   );
 };
 
-export const Layout = ({ children, activeTab, onTabChange }) => {
+export const Layout = ({
+  children,
+  activeTab,
+  onTabChange,
+  theme,
+  toggleTheme,
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const menuItems = [
@@ -44,7 +58,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
   ];
 
   return (
-    <div className="min-h-screen flex bg-darker text-gray-100 font-sans selection:bg-primary/30">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-darker text-slate-900 dark:text-gray-100 font-sans selection:bg-primary/30 transition-colors duration-300">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -56,7 +70,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
       {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-white/5 transition-transform duration-300 transform",
+          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-card border-r border-slate-200 dark:border-white/5 transition-all duration-300 transform",
           isMobileMenuOpen
             ? "translate-x-0"
             : "-translate-x-full lg:translate-x-0"
@@ -64,7 +78,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="p-6 flex items-center gap-3 border-b border-white/5">
+          <div className="p-6 flex items-center gap-3 border-b border-slate-200 dark:border-white/5">
             <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
               <School size={24} />
             </div>
@@ -84,6 +98,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
                 icon={item.icon}
                 label={item.label}
                 active={activeTab === item.id}
+                theme={theme}
                 onClick={() => {
                   onTabChange(item.id);
                   setIsMobileMenuOpen(false);
@@ -93,8 +108,8 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
           </nav>
 
           {/* User Profile */}
-          <div className="p-4 border-t border-white/5">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+          <div className="p-4 border-t border-slate-200 dark:border-white/5">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white font-bold">
                 A
               </div>
@@ -104,7 +119,7 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
                   admin@example.com
                 </p>
               </div>
-              <button className="text-gray-400 hover:text-white">
+              <button className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white">
                 <Settings size={18} />
               </button>
             </div>
@@ -114,32 +129,34 @@ export const Layout = ({ children, activeTab, onTabChange }) => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Header */}
-        <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between bg-card/50 backdrop-blur-md sticky top-0 z-30">
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 -ml-2 text-gray-400 hover:text-white"
-          >
-            <Menu size={24} />
-          </button>
-          <span className="font-semibold">
-            {menuItems.find((i) => i.id === activeTab)?.label}
-          </span>
-          <div className="w-8" /> {/* Spacer */}
-        </div>
+        {/* Header (Desktop & Mobile) */}
+        <header className="p-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-card/50 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
+            >
+              <Menu size={24} />
+            </button>
+            <h1 className="text-xl lg:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+              {menuItems.find((i) => i.id === activeTab)?.label}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-all duration-200"
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+          </div>
+        </header>
 
         {/* Content Area */}
         <div className="flex-1 overflow-auto p-4 lg:p-8 custom-scrollbar">
           <div className="max-w-6xl mx-auto space-y-8">
-            <header className="hidden lg:block mb-8">
-              <h1 className="text-3xl font-bold text-white tracking-tight">
-                {menuItems.find((i) => i.id === activeTab)?.label}
-              </h1>
-              <p className="text-gray-400 mt-1">
-                Manage your institute efficiently.
-              </p>
-            </header>
-
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {children}
             </div>

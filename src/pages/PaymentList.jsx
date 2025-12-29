@@ -60,35 +60,49 @@ export const PaymentList = () => {
     return matchesSearch && matchesFilter;
   });
 
+  if (loading) return <Loader />;
+
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-card border border-white/5 p-6 rounded-2xl flex items-center gap-4">
-          <div className="p-3 bg-primary/20 rounded-xl text-primary">
+        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
+          <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary">
             <Users size={24} />
           </div>
           <div>
-            <p className="text-gray-400 text-sm font-medium">Total Students</p>
-            <h3 className="text-2xl font-bold text-white">{totalStudents}</h3>
+            <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
+              Total Students
+            </p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {totalStudents}
+            </h3>
           </div>
         </div>
-        <div className="bg-card border border-white/5 p-6 rounded-2xl flex items-center gap-4">
-          <div className="p-3 bg-success/20 rounded-xl text-success">
+        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
+          <div className="p-3 bg-success/10 dark:bg-success/20 rounded-xl text-success">
             <Receipt size={24} />
           </div>
           <div>
-            <p className="text-gray-400 text-sm font-medium">Paid Students</p>
-            <h3 className="text-2xl font-bold text-white">{paidStudents}</h3>
+            <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
+              Paid Students
+            </p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {paidStudents}
+            </h3>
           </div>
         </div>
-        <div className="bg-card border border-white/5 p-6 rounded-2xl flex items-center gap-4">
-          <div className="p-3 bg-danger/20 rounded-xl text-danger">
+        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
+          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger">
             <AlertCircle size={24} />
           </div>
           <div>
-            <p className="text-gray-400 text-sm font-medium">Unpaid Students</p>
-            <h3 className="text-2xl font-bold text-white">{unpaidStudents}</h3>
+            <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
+              Unpaid Students
+            </p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {unpaidStudents}
+            </h3>
           </div>
         </div>
       </div>
@@ -105,14 +119,14 @@ export const PaymentList = () => {
             placeholder="Search by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-card border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+            className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
           />
         </div>
         <div className="flex items-center gap-3">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-card border border-white/5 text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer appearance-none"
+            className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer appearance-none shadow-sm dark:shadow-none"
           >
             <option value="All">All Status</option>
             <option value="Paid">Paid</option>
@@ -122,10 +136,10 @@ export const PaymentList = () => {
       </div>
 
       {/* Payments Table */}
-      <div className="bg-card border border-white/5 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
+            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4 font-medium">Student</th>
                 <th className="px-6 py-4 font-medium">Batch</th>
@@ -137,7 +151,7 @@ export const PaymentList = () => {
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {filteredStudents.map((student) => {
                 const status =
                   student.status ||
@@ -157,7 +171,7 @@ export const PaymentList = () => {
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-white/10">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 dark:border-white/10">
                           {student.photo ? (
                             <img
                               src={student.photo}
@@ -165,23 +179,26 @@ export const PaymentList = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <Users size={14} className="text-gray-400" />
+                            <Users
+                              size={14}
+                              className="text-slate-400 dark:text-gray-400"
+                            />
                           )}
                         </div>
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-slate-900 dark:text-white">
                           {student.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
+                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                       {Array.isArray(student.batch)
                         ? student.batch.join(", ")
                         : student.batch}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
+                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                       {calculateValidity(student.admissionDate)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-white font-medium">
+                    <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
                       ₹{student.totalAmount || 0}
                     </td>
                     <td className="px-6 py-4 text-sm text-success">
@@ -208,7 +225,7 @@ export const PaymentList = () => {
                           setEditingStudent(student);
                           setIsFormOpen(true);
                         }}
-                        className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                         title="Edit Payment"
                       >
                         <Edit2 size={16} />

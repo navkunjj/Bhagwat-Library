@@ -10,6 +10,9 @@ const App = () => {
   const [activeTab, setActiveTab] = React.useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [theme, setTheme] = React.useState(
+    localStorage.getItem("theme") || "dark"
+  );
 
   React.useEffect(() => {
     const loggedIn = sessionStorage.getItem("isLoggedIn");
@@ -17,6 +20,19 @@ const App = () => {
       setIsAuthenticated(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const handleLogin = () => {
     sessionStorage.setItem("isLoggedIn", "true");
@@ -43,7 +59,12 @@ const App = () => {
   };
 
   return (
-    <Layout activeTab={activeTab} onTabChange={setActiveTab}>
+    <Layout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      theme={theme}
+      toggleTheme={toggleTheme}
+    >
       {renderContent()}
     </Layout>
   );

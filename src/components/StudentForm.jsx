@@ -111,16 +111,19 @@ export const StudentForm = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#1e293b] w-full max-w-md rounded-2xl border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#1e293b] z-10">
-          <h2 className="text-xl font-bold text-white">
+      <div className="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/5 sticky top-0 bg-white dark:bg-[#1e293b] z-10 transition-colors duration-300">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             {mode === "payment"
               ? "Edit Payment Details"
               : student
               ? "Edit Student"
               : "Add New Student"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button
+            onClick={onClose}
+            className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
@@ -131,7 +134,7 @@ export const StudentForm = ({
             <div
               className={`relative ${
                 mode === "personal" ? "group cursor-pointer" : ""
-              } w-24 h-24 rounded-full overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center`}
+              } w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center`}
             >
               {mode === "personal" && (
                 <input
@@ -148,7 +151,7 @@ export const StudentForm = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="text-gray-400 text-xs text-center px-2">
+                <div className="text-slate-400 dark:text-gray-400 text-xs text-center px-2">
                   {mode === "personal" ? "Upload Photo" : "No Photo"}
                 </div>
               )}
@@ -161,7 +164,7 @@ export const StudentForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
               Full Name
             </label>
             <input
@@ -173,10 +176,10 @@ export const StudentForm = ({
                 setFormData({ ...formData, name: e.target.value })
               }
               className={clsx(
-                "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none transition-all placeholder:text-gray-600",
+                "w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600",
                 mode === "personal"
                   ? "focus:ring-2 focus:ring-primary/50"
-                  : "cursor-not-allowed text-gray-400"
+                  : "cursor-not-allowed text-slate-400 dark:text-gray-400"
               )}
               placeholder="e.g. John Doe"
             />
@@ -185,7 +188,7 @@ export const StudentForm = ({
           {mode === "personal" && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+                <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
                   Phone Number
                 </label>
                 <input
@@ -195,12 +198,12 @@ export const StudentForm = ({
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
                   placeholder="e.g. 1234567890"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+                <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
                   Address
                 </label>
                 <textarea
@@ -209,12 +212,12 @@ export const StudentForm = ({
                   onChange={(e) =>
                     setFormData({ ...formData, address: e.target.value })
                   }
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600 resize-none h-24"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 resize-none h-24"
                   placeholder="e.g. 123 Main St, Area"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+                <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
                   Admission Date
                 </label>
                 <input
@@ -224,7 +227,7 @@ export const StudentForm = ({
                   onChange={(e) =>
                     setFormData({ ...formData, admissionDate: e.target.value })
                   }
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
             </>
@@ -232,7 +235,7 @@ export const StudentForm = ({
 
           {/* Batch Selection - Multi-select for Personal, Read-only for Payment */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-2">
               Batches
             </label>
             <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar p-1">
@@ -243,7 +246,7 @@ export const StudentForm = ({
                     "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
                     formData.batch.includes(b.time)
                       ? "bg-primary/10 border-primary/50"
-                      : "bg-white/5 border-white/10 hover:border-white/20"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-primary/20 dark:hover:border-white/20"
                   )}
                 >
                   <input
@@ -254,10 +257,12 @@ export const StudentForm = ({
                     className="w-5 h-5 rounded border-gray-600 text-primary focus:ring-primary/50 bg-gray-700"
                   />
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-white">
+                    <div className="text-sm font-medium text-slate-900 dark:text-white">
                       {b.time}
                     </div>
-                    <div className="text-xs text-gray-400">₹{b.price}</div>
+                    <div className="text-xs text-slate-500 dark:text-gray-400">
+                      ₹{b.price}
+                    </div>
                   </div>
                 </label>
               ))}
@@ -266,20 +271,20 @@ export const StudentForm = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
                 Total Fee
               </label>
               <input
                 type="number"
                 readOnly
                 value={formData.totalAmount}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-gray-500 focus:outline-none cursor-not-allowed"
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-400 dark:text-gray-500 focus:outline-none cursor-not-allowed"
                 placeholder="Auto-filled"
               />
             </div>
             {/* Paid Amount - Always visible/editable now as requested */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
                 Paid Amount
               </label>
               <input
@@ -290,7 +295,7 @@ export const StudentForm = ({
                 onChange={(e) =>
                   setFormData({ ...formData, paidAmount: e.target.value })
                 }
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
                 placeholder="₹ 0"
               />
             </div>
@@ -298,9 +303,11 @@ export const StudentForm = ({
             {/* Hidden logic block for previous mode check removal */}
           </div>
 
-          <div className="bg-white/5 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4 flex items-center justify-between border border-slate-100 dark:border-none">
             <div className="flex flex-col">
-              <span className="text-xs text-gray-400">Status</span>
+              <span className="text-xs text-slate-500 dark:text-gray-400">
+                Status
+              </span>
               <span
                 className={clsx(
                   "font-bold",
@@ -311,8 +318,12 @@ export const StudentForm = ({
               </span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="text-xs text-gray-400">Balance Due</span>
-              <span className="font-bold text-white">₹{restFee}</span>
+              <span className="text-xs text-slate-500 dark:text-gray-400">
+                Balance Due
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                ₹{restFee}
+              </span>
             </div>
           </div>
 

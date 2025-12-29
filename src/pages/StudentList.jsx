@@ -70,7 +70,7 @@ export const StudentList = () => {
             placeholder="Search by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-card border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+            className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -88,10 +88,10 @@ export const StudentList = () => {
       </div>
 
       {/* Student Table */}
-      <div className="bg-card border border-white/5 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
         <div className="overflow-x-auto custom-scrollbar max-h-[600px] overflow-y-auto">
           <table className="w-full text-left min-w-[640px]">
-            <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
+            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
               <tr>
                 <th className="px-4 md:px-6 py-4 font-medium">Student</th>
                 <th className="px-4 md:px-6 py-4 font-medium">Phone</th>
@@ -103,19 +103,19 @@ export const StudentList = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {filteredStudents.map((student) => {
                 return (
                   <tr
                     key={student.id}
-                    className="hover:bg-white/5 transition-colors group"
+                    className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors group"
                   >
                     <td className="px-4 md:px-6 py-4">
                       <div
                         onClick={() => setViewingStudent(student)}
                         className="flex items-center gap-3 cursor-pointer group/profile"
                       >
-                        <div className="w-10 h-10 rounded-full bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-white/10 group-hover/profile:border-primary/50 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 dark:border-white/10 group-hover/profile:border-primary/50 transition-colors">
                           {student.photo ? (
                             <img
                               src={student.photo}
@@ -125,21 +125,21 @@ export const StudentList = () => {
                           ) : (
                             <Users
                               size={18}
-                              className="text-gray-400 group-hover/profile:text-primary transition-colors"
+                              className="text-slate-400 dark:text-gray-400 group-hover/profile:text-primary transition-colors"
                             />
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-white group-hover/profile:text-primary transition-colors">
+                          <p className="font-medium text-slate-900 dark:text-white group-hover/profile:text-primary transition-colors">
                             {student.name}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-gray-400">
+                    <td className="px-4 md:px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                       {student.phone}
                     </td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-gray-400">
+                    <td className="px-4 md:px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                       {student.admissionDate || "-"}
                     </td>
                     <td className="px-4 md:px-6 py-4">
@@ -164,7 +164,7 @@ export const StudentList = () => {
                         );
                       })()}
                     </td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-gray-400 truncate max-w-[200px]">
+                    <td className="px-4 md:px-6 py-4 text-sm text-slate-500 dark:text-gray-400 truncate max-w-[200px]">
                       {student.address}
                     </td>
                     <td className="px-4 md:px-6 py-4 text-right">
@@ -174,13 +174,13 @@ export const StudentList = () => {
                             setEditingStudent(student);
                             setIsFormOpen(true);
                           }}
-                          className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          className="p-2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                         >
                           <Edit2 size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(student.id)}
-                          className="p-2 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                          className="p-2 text-slate-400 dark:text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>

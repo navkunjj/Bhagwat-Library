@@ -7,10 +7,14 @@ import { Loader } from "../components/Loader";
 const StatCard = ({ label, value, subtext, icon, color }) => {
   const Icon = icon;
   return (
-    <div className="bg-card border border-white/5 rounded-2xl p-6 flex items-start justify-between hover:border-white/10 transition-colors group">
+    <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl p-6 flex items-start justify-between hover:border-primary/20 dark:hover:border-white/10 transition-all duration-300 group shadow-sm dark:shadow-none">
       <div>
-        <p className="text-sm font-medium text-gray-400 mb-1">{label}</p>
-        <h3 className="text-3xl font-bold text-white mb-1">{value}</h3>
+        <p className="text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
+          {label}
+        </p>
+        <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+          {value}
+        </h3>
         {subtext && (
           <p className={clsx("text-xs flex items-center gap-1", color)}>
             {subtext}
@@ -19,7 +23,7 @@ const StatCard = ({ label, value, subtext, icon, color }) => {
       </div>
       <div
         className={clsx(
-          "p-3 rounded-xl bg-white/5 group-hover:bg-white/10 transition-colors",
+          "p-3 rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-colors",
           color
         )}
       >
@@ -78,9 +82,11 @@ export const Dashboard = ({ onTabChange }) => {
       </div>
 
       {/* Recent Activity / Quick View */}
-      <div className="bg-card border border-white/5 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <h3 className="font-semibold text-lg">Recent Admitted Students</h3>
+      <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 dark:border-white/5 flex items-center justify-between">
+          <h3 className="font-semibold text-lg text-slate-900 dark:text-white">
+            Recent Admitted Students
+          </h3>
           <button
             onClick={() => onTabChange?.("students")}
             className="text-sm text-primary hover:text-primary/80 transition-colors"
@@ -90,23 +96,23 @@ export const Dashboard = ({ onTabChange }) => {
         </div>
         <div className="overflow-x-auto custom-scrollbar max-h-[400px] overflow-y-auto">
           <table className="w-full text-left">
-            <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider sticky top-0">
+            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0">
               <tr>
                 <th className="px-6 py-4 font-medium">Name</th>
                 <th className="px-6 py-4 font-medium">Batch</th>
                 <th className="px-6 py-4 font-medium">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {recentStudents.map((student) => (
                 <tr
                   key={student.id}
-                  className="hover:bg-white/5 transition-colors"
+                  className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-white">
+                  <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">
                     {student.name}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-400">
+                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                     {student.batch}
                   </td>
                   <td className="px-6 py-4">
