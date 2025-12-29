@@ -2,6 +2,7 @@ import React from "react";
 import { Users, CreditCard, AlertCircle } from "lucide-react";
 import { getStudents } from "../utils/store";
 import { clsx } from "clsx";
+import { Loader } from "../components/Loader";
 
 const StatCard = ({ label, value, subtext, icon, color }) => {
   const Icon = icon;
@@ -31,6 +32,7 @@ const StatCard = ({ label, value, subtext, icon, color }) => {
 export const Dashboard = ({ onTabChange }) => {
   const [stats, setStats] = React.useState({ total: 0, paid: 0, unpaid: 0 });
   const [recentStudents, setRecentStudents] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchStats = async () => {
@@ -41,9 +43,12 @@ export const Dashboard = ({ onTabChange }) => {
 
       setStats({ total, paid, unpaid });
       setRecentStudents(students.slice(0, 5)); // Show top 5
+      setLoading(false);
     };
     fetchStats();
   }, []);
+
+  if (loading) return <Loader />;
 
   return (
     <div className="space-y-6">

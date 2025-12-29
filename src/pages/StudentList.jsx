@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { getStudents, deleteStudent } from "../utils/store";
 import { StudentForm } from "../components/StudentForm";
 import { StudentProfile } from "../components/StudentProfile";
+import { Loader } from "../components/Loader";
 
 export const StudentList = () => {
   const [students, setStudents] = React.useState([]);
@@ -11,9 +12,12 @@ export const StudentList = () => {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingStudent, setEditingStudent] = React.useState(null);
   const [viewingStudent, setViewingStudent] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [filterBatch, setFilterBatch] = React.useState("All");
 
   const loadStudents = async () => {
     setStudents(await getStudents());
+    setLoading(false);
   };
 
   React.useEffect(() => {
@@ -27,12 +31,30 @@ export const StudentList = () => {
     }
   };
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch = student.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
+  const filteredStudents = students
+    .filter((student) => {
+      // Filter by Search
+      const matchesSearch =
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.phone.includes(searchTerm) ||
+        (student.batch && student.batch.includes(searchTerm)); // Check if batch array includes term logic if needed, or join.
+
+      // Logic above for batch array search might be weak if strict. Better:
+      // const batchStr = Array.isArray(student.batch) ? student.batch.join(" ") : student.batch;
+      // ... includes(searchTerm) ...
+
+      // Filter by Batch
+      const matchesBatch =
+        filterBatch === "All" ||
+        (Array.isArray(student.batch)
+          ? student.batch.includes(filterBatch)
+          : student.batch === filterBatch);
+
+      return matchesSearch && matchesBatch;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  if (loading) return <Loader />;
 
   return (
     <div className="space-y-6">

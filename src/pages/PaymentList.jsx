@@ -1,8 +1,22 @@
 import React from "react";
-import { Search, Users, Receipt, AlertCircle, Edit2, Bell } from "lucide-react";
-import { getStudents, calculateValidity } from "../utils/store";
+import {
+  Search,
+  Users,
+  Receipt,
+  AlertCircle,
+  Edit2,
+  Bell,
+  Check,
+  XCircle,
+} from "lucide-react";
+import {
+  getStudents,
+  calculateValidity,
+  updateStudentPayment,
+} from "../utils/store";
 import { clsx } from "clsx";
 import { StudentForm } from "../components/StudentForm";
+import { Loader } from "../components/Loader";
 
 export const PaymentList = () => {
   const [students, setStudents] = React.useState([]);
@@ -10,9 +24,11 @@ export const PaymentList = () => {
   const [filterStatus, setFilterStatus] = React.useState("All"); // All, Paid, Unpaid
   const [editingStudent, setEditingStudent] = React.useState(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const loadStudents = async () => {
     setStudents(await getStudents());
+    setLoading(false);
   };
 
   React.useEffect(() => {

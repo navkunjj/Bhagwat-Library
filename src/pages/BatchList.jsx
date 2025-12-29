@@ -2,15 +2,18 @@ import React from "react";
 import { Plus, Edit2, Trash2, Save, X, Clock, IndianRupee } from "lucide-react";
 import { getBatches, saveBatch, deleteBatch } from "../utils/store";
 import { clsx } from "clsx";
+import { Loader } from "../components/Loader";
 
 export const BatchList = () => {
   const [batches, setBatches] = React.useState([]);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingBatch, setEditingBatch] = React.useState(null);
   const [formData, setFormData] = React.useState({ time: "", price: "" });
+  const [loading, setLoading] = React.useState(true);
 
   const loadBatches = async () => {
     setBatches(await getBatches());
+    setLoading(false);
   };
 
   React.useEffect(() => {
@@ -61,46 +64,51 @@ export const BatchList = () => {
         </button>
       </div>
 
-      {/* Batch Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {batches.map((batch) => (
-          <div
-            key={batch.id}
-            className="bg-card border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all group"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1 rounded-lg">
-                <Clock size={16} />
-                <span className="font-medium text-sm">Batch Timing</span>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {batches.map((batch) => (
+            <div
+              key={batch.id}
+              className="bg-card border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1 rounded-lg">
+                  <Clock size={16} />
+                  <span className="font-medium text-sm">Batch Timing</span>
+                </div>
+                <div className="flex gap-2 transition-opacity">
+                  <button
+                    onClick={() => handleEdit(batch)}
+                    className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(batch.id)}
+                    className="p-1.5 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2 transition-opacity">
-                <button
-                  onClick={() => handleEdit(batch)}
-                  className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <Edit2 size={16} />
-                </button>
-                <button
-                  onClick={() => handleDelete(batch.id)}
-                  className="p-1.5 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
+
+              <h3 className="text-lg font-bold text-white mb-2">
+                {batch.time}
+              </h3>
+
+              <div className="flex items-center gap-2 text-gray-400">
+                <IndianRupee size={16} />
+                <span className="text-2xl font-bold text-success/90">
+                  {batch.price}
+                </span>
+                <span className="text-xs">/ month</span>
               </div>
             </div>
-
-            <h3 className="text-lg font-bold text-white mb-2">{batch.time}</h3>
-
-            <div className="flex items-center gap-2 text-gray-400">
-              <IndianRupee size={16} />
-              <span className="text-2xl font-bold text-success/90">
-                {batch.price}
-              </span>
-              <span className="text-xs">/ month</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal Form */}
       {isFormOpen && (
