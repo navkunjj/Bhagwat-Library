@@ -12,46 +12,55 @@ export const CameraCapture = ({ onCapture, onClose }) => {
 
   React.useEffect(() => {
     startCamera();
-    return () => stopCamera();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
   }, [facingMode]);
+
+  // Separate effect for attaching stream to video element
+  React.useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current?.play().catch(console.error);
+        setLoading(false);
+      };
+    }
+  }, [stream]);
 
   const startCamera = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Manual cleanup before starting new
-      if (videoRef.current && videoRef.current.srcObject) {
-        const tracks = videoRef.current.srcObject.getTracks();
-        tracks.forEach((track) => track.stop());
-        videoRef.current.srcObject = null;
+      // Cleanup previous stream tracks
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
       }
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facingMode },
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       });
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch((e) => console.error("Play error:", e));
-          setLoading(false);
-        };
-      }
       setStream(mediaStream);
     } catch (err) {
-      console.error("Camera error:", err);
+      console.error("Primary camera error:", err);
       try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
           video: true,
+          audio: false,
         });
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          setLoading(false);
-        }
-        setStream(mediaStream);
+        setStream(fallbackStream);
       } catch (fallbackErr) {
-        setError("Camera access failed. Check permissions and HTTPS.");
+        console.error("Final camera error:", fallbackErr);
+        setError(
+          "Camera access failed. Ensure permissions are granted and you are on a secure (HTTPS) site."
+        );
         setLoading(false);
       }
     }
@@ -61,9 +70,6 @@ export const CameraCapture = ({ onCapture, onClose }) => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
     }
   };
 
