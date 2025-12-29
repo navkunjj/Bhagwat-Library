@@ -1,0 +1,68 @@
+import React from "react";
+import { Lock } from "lucide-react";
+
+export const Login = ({ onLogin }) => {
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (password === "admin853203") {
+      onLogin();
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 2000); // Clear error after 2s
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-[#1e293b] rounded-2xl border border-white/10 shadow-xl overflow-hidden">
+        <div className="p-8">
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
+              <Lock size={32} />
+            </div>
+            <h1 className="text-2xl font-bold text-white text-center">
+              Admin Access
+            </h1>
+            <p className="text-gray-400 text-center text-sm">
+              Please enter the password to access the Bhagwat Library Admin
+              Portal.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full bg-white/5 border ${
+                  error ? "border-danger animate-shake" : "border-white/10"
+                } rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600 text-center tracking-widest`}
+                placeholder="Enter Password"
+                autoFocus
+              />
+              {error && (
+                <p className="text-danger text-xs text-center mt-2 animate-in fade-in slide-in-from-top-1">
+                  Incorrect password. Please try again.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-primary/20"
+            >
+              Access Portal
+            </button>
+          </form>
+        </div>
+        <div className="bg-white/5 p-4 text-center">
+          <p className="text-gray-500 text-xs">® Bhagwat Library</p>
+        </div>
+      </div>
+    </div>
+  );
+};
