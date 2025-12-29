@@ -17,6 +17,7 @@ import {
 import { clsx } from "clsx";
 import { StudentForm } from "../components/StudentForm";
 import { Loader } from "../components/Loader";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export const PaymentList = () => {
   const [students, setStudents] = React.useState([]);
@@ -25,6 +26,7 @@ export const PaymentList = () => {
   const [editingStudent, setEditingStudent] = React.useState(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [notificationSent, setNotificationSent] = React.useState(null); // { name: '', amount: 0 }
 
   const loadStudents = async () => {
     setStudents(await getStudents());
@@ -233,9 +235,10 @@ export const PaymentList = () => {
                       {status === "Unpaid" && balance > 0 && (
                         <button
                           onClick={() => {
-                            alert(
-                              `Notification sent to ${student.name} for pending due: ₹${balance}`
-                            );
+                            setNotificationSent({
+                              name: student.name,
+                              amount: balance,
+                            });
                           }}
                           className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors"
                           title="Send Notification"
@@ -277,6 +280,16 @@ export const PaymentList = () => {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!notificationSent}
+        onClose={() => setNotificationSent(null)}
+        title="Notification Sent"
+        message={`Success! A notification has been sent to ${notificationSent?.name} regarding their pending balance of ₹${notificationSent?.amount}.`}
+        confirmText="Got it"
+        variant="success"
+        showCancel={false}
+      />
     </div>
   );
 };
