@@ -5,6 +5,7 @@ import { getStudents, deleteStudent } from "../utils/store";
 import { StudentForm } from "../components/StudentForm";
 import { StudentProfile } from "../components/StudentProfile";
 import { Loader } from "../components/Loader";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export const StudentList = () => {
   const [students, setStudents] = React.useState([]);
@@ -14,6 +15,7 @@ export const StudentList = () => {
   const [viewingStudent, setViewingStudent] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [filterBatch, setFilterBatch] = React.useState("All");
+  const [studentToDelete, setStudentToDelete] = React.useState(null);
 
   const loadStudents = async () => {
     setStudents(await getStudents());
@@ -24,10 +26,11 @@ export const StudentList = () => {
     loadStudents();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this student?")) {
-      await deleteStudent(id);
+  const handleDelete = async () => {
+    if (studentToDelete) {
+      await deleteStudent(studentToDelete);
       loadStudents();
+      setStudentToDelete(null);
     }
   };
 
@@ -179,7 +182,7 @@ export const StudentList = () => {
                           <Edit2 size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(student.id)}
+                          onClick={() => setStudentToDelete(student.id)}
                           className="p-2 text-slate-400 dark:text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                         >
                           <Trash2 size={16} />
@@ -238,6 +241,15 @@ export const StudentList = () => {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Student"
+        message="Are you sure you want to delete this student? This action cannot be undone."
+        confirmText="Delete Student"
+      />
     </div>
   );
 };

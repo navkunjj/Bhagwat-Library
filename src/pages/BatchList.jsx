@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Save, X, Clock, IndianRupee } from "lucide-react";
 import { getBatches, saveBatch, deleteBatch } from "../utils/store";
 import { clsx } from "clsx";
 import { Loader } from "../components/Loader";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export const BatchList = () => {
   const [batches, setBatches] = React.useState([]);
@@ -10,6 +11,7 @@ export const BatchList = () => {
   const [editingBatch, setEditingBatch] = React.useState(null);
   const [formData, setFormData] = React.useState({ time: "", price: "" });
   const [loading, setLoading] = React.useState(true);
+  const [batchToDelete, setBatchToDelete] = React.useState(null);
 
   const loadBatches = async () => {
     setBatches(await getBatches());
@@ -39,10 +41,11 @@ export const BatchList = () => {
     setIsFormOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this batch?")) {
-      await deleteBatch(id);
+  const handleDelete = async () => {
+    if (batchToDelete) {
+      await deleteBatch(batchToDelete);
       loadBatches();
+      setBatchToDelete(null);
     }
   };
 
@@ -88,8 +91,8 @@ export const BatchList = () => {
                     <Edit2 size={16} />
                   </button>
                   <button
-                    onClick={() => handleDelete(batch.id)}
-                    className="p-1.5 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                    onClick={() => setBatchToDelete(batch.id)}
+                    className="p-1.5 text-slate-400 dark:text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -121,11 +124,7 @@ export const BatchList = () => {
                 {editingBatch ? "Edit Batch" : "Add New Batch"}
               </h2>
               <button
-                onClick={() =>
-                  setIsMobileMenuOpen
-                    ? setIsMobileMenuOpen(false)
-                    : setIsFormOpen(false)
-                }
+                onClick={() => setIsFormOpen(false)}
                 className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
               >
                 <X size={20} />
@@ -178,6 +177,15 @@ export const BatchList = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!batchToDelete}
+        onClose={() => setBatchToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Batch"
+        message="Are you sure you want to delete this batch? This will affect all students assigned to this timing."
+        confirmText="Delete Batch"
+      />
     </div>
   );
 };
