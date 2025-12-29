@@ -7,6 +7,7 @@ export const Login = ({ onLogin }) => {
 
   const [showBiometricPrompt, setShowBiometricPrompt] = React.useState(false);
   const [isBiometricAvailable, setIsBiometricAvailable] = React.useState(false);
+  const [credentialId, setCredentialId] = React.useState(null);
 
   React.useEffect(() => {
     if (
@@ -16,20 +17,30 @@ export const Login = ({ onLogin }) => {
       PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(
         (available) => {
           setIsBiometricAvailable(available);
-          checkBiometricRegistration();
+          fetchCredentialId();
         }
       );
     }
   }, []);
 
-  const checkBiometricRegistration = () => {
-    const credentialId = localStorage.getItem("biometricCredentialId");
-    return !!credentialId;
+  const fetchCredentialId = async () => {
+    try {
+      const res = await fetch(
+        "https://bhagwat-library.onrender.com/api/auth/biometric-user"
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.credentialId) {
+          setCredentialId(data.credentialId);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch biometric credential", err);
+    }
   };
 
   const handleBiometricLogin = async () => {
     try {
-      const credentialId = localStorage.getItem("biometricCredentialId");
       if (!credentialId) return;
 
       const challenge = new Uint8Array(32);
@@ -90,16 +101,24 @@ export const Login = ({ onLogin }) => {
       });
 
       if (credential) {
-        // Store the raw ID in localStorage (base64 encoded for string storage)
         const rawId = btoa(
           String.fromCharCode(...new Uint8Array(credential.rawId))
         );
-        localStorage.setItem("biometricCredentialId", rawId);
+
+        // Save to backend
+        await fetch(
+          "https://bhagwat-library.onrender.com/api/auth/register-biometric",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credentialId: rawId }),
+          }
+        );
+
         onLogin();
       }
     } catch (err) {
       console.error("Biometric registration failed:", err);
-      // Fallback to normal login if registration fails/cancelled
       onLogin();
     }
   };
@@ -107,8 +126,13 @@ export const Login = ({ onLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password === "admin853203") {
-      // Check if biometric is available but not registered
-      if (isBiometricAvailable && !checkBiometricRegistration()) {
+      // Check if biometric is available. If we have no ID on backend, prompt to register.
+      // If we HAVE an ID, we still might want to re-register (overwrite)?
+      // User requirement: "always make first fingerprint".
+      // If one exists, we shouldn't force prompt?
+      // Actually, if they typed password, maybe they want to Register NEW device?
+      // Let's prompt if available.
+      if (isBiometricAvailable) {
         setShowBiometricPrompt(true);
       } else {
         onLogin();
@@ -163,7 +187,7 @@ export const Login = ({ onLogin }) => {
             </button>
           </form>
 
-          {isBiometricAvailable && checkBiometricRegistration() && (
+          {isBiometricAvailable && credentialId && (
             <div className="mt-6 pt-6 border-t border-white/10">
               <button
                 onClick={handleBiometricLogin}

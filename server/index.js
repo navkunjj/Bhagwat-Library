@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const studentRoutes = require('./routes/students');
 const batchRoutes = require('./routes/batches');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Routes
 app.use('/api/students', studentRoutes);
 app.use('/api/batches', batchRoutes);
+app.use('/api/auth', authRoutes);
 
 // Base Route
 app.get('/', (req, res) => {
