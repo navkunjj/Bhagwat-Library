@@ -7,27 +7,55 @@ export const CameraCapture = ({ onCapture, onClose }) => {
   const [stream, setStream] = React.useState(null);
   const [preview, setPreview] = React.useState(null);
   const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     startCamera();
     return () => stopCamera();
   }, []);
 
+  React.useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
   const startCamera = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
+      const constraints = {
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
-      });
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError(
-        "Could not access camera. Please ensure permissions are granted."
+      };
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
       );
+      setStream(mediaStream);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error accessing camera with constraints:", err);
+      try {
+        // Fallback to basic video if complex constraints fail
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        setStream(mediaStream);
+        setLoading(false);
+      } catch (fallbackErr) {
+        console.error(
+          "Error accessing camera even with fallback:",
+          fallbackErr
+        );
+        setError(
+          "Could not access camera. Please ensure permissions are granted and you are using a secure connection (HTTPS)."
+        );
+        setLoading(false);
+      }
     }
   };
 
@@ -97,12 +125,21 @@ export const CameraCapture = ({ onCapture, onClose }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
+            <>
+              {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+                  <RefreshCw className="text-primary animate-spin" size={32} />
+                </div>
+              )}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                onLoadedMetadata={() => videoRef.current?.play()}
+                className="w-full h-full object-cover"
+              />
+            </>
           )}
           <canvas ref={canvasRef} className="hidden" />
         </div>
