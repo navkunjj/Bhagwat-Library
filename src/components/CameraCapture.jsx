@@ -75,8 +75,15 @@ export const CameraCapture = ({ onCapture, onClose }) => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
+      // Flip context horizontally to match mirrored preview
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+
       // Draw frame to canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Reset transform for future use (if any)
+      context.setTransform(1, 0, 0, 1, 0, 0);
 
       // Convert to base64
       const imageData = canvas.toDataURL("image/jpeg", 0.8);
@@ -137,7 +144,7 @@ export const CameraCapture = ({ onCapture, onClose }) => {
                 playsInline
                 muted
                 onLoadedMetadata={() => videoRef.current?.play()}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover -scale-x-100"
               />
             </>
           )}
