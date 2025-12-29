@@ -79,8 +79,12 @@ export const Layout = ({
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="p-6 flex items-center gap-3 border-b border-slate-200 dark:border-white/5">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-              <School size={24} />
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm">
+              <img
+                src="/logo.jpg"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <h1 className="font-bold text-lg leading-tight">
@@ -110,13 +114,17 @@ export const Layout = ({
           {/* User Profile */}
           <div className="p-4 border-t border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white font-bold">
-                A
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
+                <img
+                  src="/logo.jpg"
+                  alt="Admin"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">Admin User</p>
                 <p className="text-xs text-gray-500 truncate">
-                  admin@example.com
+                  bhagwatlibrary0@gmail.com
                 </p>
               </div>
               <button className="text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white">

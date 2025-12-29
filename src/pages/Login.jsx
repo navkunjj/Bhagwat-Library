@@ -20,8 +20,12 @@ export const Login = ({ onLogin }) => {
       <div className="w-full max-w-sm bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden shadow-primary/5 dark:shadow-none transition-all duration-300">
         <div className="p-8">
           <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary mb-2">
-              <Lock size={32} />
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 shadow-lg flex items-center justify-center">
+              <img
+                src="/logo.jpg"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center">
               Admin Access
