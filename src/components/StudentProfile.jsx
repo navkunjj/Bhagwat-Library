@@ -14,7 +14,7 @@ import {
 import { clsx } from "clsx";
 import { updateStudentPayment, calculateValidity } from "../utils/store";
 
-export const StudentProfile = ({ student, onClose, onUpdate }) => {
+export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
   const [isEditingPayment, setIsEditingPayment] = React.useState(false);
   const [paidAmount, setPaidAmount] = React.useState(student?.paidAmount || 0);
   const [error, setError] = React.useState("");
@@ -61,12 +61,21 @@ export const StudentProfile = ({ student, onClose, onUpdate }) => {
       <div className="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar transition-colors duration-300">
         {/* Header */}
         <div className="relative">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
-          >
-            <X size={20} />
-          </button>
+          <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <button
+              onClick={onEdit}
+              className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+              title="Edit full profile"
+            >
+              <Edit2 size={20} />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
           <div className="h-32 bg-gradient-to-r from-primary/10 to-purple-500/10 dark:from-primary/20 dark:to-purple-500/20 w-full" />
           <div className="absolute -bottom-12 left-6">
             <div className="w-24 h-24 rounded-full border-4 border-white dark:border-[#1e293b] bg-white dark:bg-[#1e293b] overflow-hidden flex items-center justify-center shadow-lg transition-colors">

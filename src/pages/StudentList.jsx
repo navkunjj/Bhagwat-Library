@@ -228,6 +228,11 @@ export const StudentList = () => {
         <StudentProfile
           student={viewingStudent}
           onClose={() => setViewingStudent(null)}
+          onEdit={() => {
+            setEditingStudent(viewingStudent);
+            setViewingStudent(null);
+            setIsFormOpen(true);
+          }}
           onUpdate={async () => {
             loadStudents();
             // Update the viewing student with fresh data
