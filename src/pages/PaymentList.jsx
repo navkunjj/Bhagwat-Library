@@ -73,63 +73,99 @@ export const PaymentList = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+        <button
+          onClick={() => setFilterStatus("All")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "All"
+              ? "border-primary ring-2 ring-primary/20"
+              : "border-slate-200 dark:border-white/5 hover:border-primary/50"
+          )}
+        >
+          <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary font-bold">
             <Users size={24} />
           </div>
           <div>
             <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
-              Total Students
+              Total
             </p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
               {totalStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-success/10 dark:bg-success/20 rounded-xl text-success">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Paid")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Paid"
+              ? "border-success ring-2 ring-success/20"
+              : "border-slate-200 dark:border-white/5 hover:border-success/50"
+          )}
+        >
+          <div className="p-3 bg-success/10 dark:bg-success/20 rounded-xl text-success font-bold">
             <Receipt size={24} />
           </div>
           <div>
             <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
-              Paid Students
+              Paid
             </p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
               {paidStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl text-yellow-500">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Partial")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Partial"
+              ? "border-yellow-500 ring-2 ring-yellow-500/20"
+              : "border-slate-200 dark:border-white/5 hover:border-yellow-500/50"
+          )}
+        >
+          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl text-yellow-500 font-bold">
             <AlertCircle size={24} />
           </div>
           <div>
             <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
-              Partial Students
+              Partial
             </p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
               {partialStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Unpaid")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Unpaid"
+              ? "border-danger ring-2 ring-danger/20"
+              : "border-slate-200 dark:border-white/5 hover:border-danger/50"
+          )}
+        >
+          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger font-bold">
             <XCircle size={24} />
           </div>
           <div>
             <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
-              Unpaid Students
+              Unpaid
             </p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
               {unpaidStudents}
             </h3>
           </div>
-        </div>
+        </button>
       </div>
 
-      {/* Header & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header & Tabs */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -137,22 +173,44 @@ export const PaymentList = () => {
           />
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Search students..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
+            className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
           />
         </div>
-        <div className="flex items-center gap-3">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer appearance-none shadow-sm dark:shadow-none"
-          >
-            <option value="All">All Status</option>
-            <option value="Paid">Paid</option>
-            <option value="Unpaid">Unpaid</option>
-          </select>
+
+        {/* Tabs */}
+        <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl w-full md:w-auto overflow-x-auto custom-scrollbar-hidden">
+          {[
+            { id: "All", label: "All", count: totalStudents },
+            { id: "Paid", label: "Paid", count: paidStudents },
+            { id: "Partial", label: "Partial", count: partialStudents },
+            { id: "Unpaid", label: "Unpaid", count: unpaidStudents },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setFilterStatus(tab.id)}
+              className={clsx(
+                "flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                filterStatus === tab.id
+                  ? "bg-white dark:bg-[#1e293b] text-primary shadow-sm ring-1 ring-slate-200 dark:ring-white/10"
+                  : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
+              )}
+            >
+              {tab.label}
+              <span
+                className={clsx(
+                  "px-2 py-0.5 rounded-full text-[10px] font-bold",
+                  filterStatus === tab.id
+                    ? "bg-primary/10 text-primary"
+                    : "bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-gray-500"
+                )}
+              >
+                {tab.count}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
