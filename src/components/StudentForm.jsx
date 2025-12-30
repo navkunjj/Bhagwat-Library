@@ -1,27 +1,5 @@
 import React from "react";
-import {
-  Users,
-  Image as ImageIcon,
-  X,
-  CreditCard,
-  Calendar,
-  IndianRupee,
-  Clock,
-  Briefcase,
-  AlertCircle,
-  Phone,
-  FileText,
-  Save,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-  Armchair,
-  Lock,
-  Loader2,
-  Camera,
-  Edit2,
-} from "lucide-react";
+import { X, Save, Edit2, Camera, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches } from "../utils/store";
 import { CameraCapture } from "./CameraCapture";
@@ -337,13 +315,8 @@ export const StudentForm = ({
           {/* Seat Number Scrollable Dial */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="text-sm font-medium text-slate-500 dark:text-gray-400 flex items-center gap-2">
+              <label className="text-sm font-medium text-slate-500 dark:text-gray-400">
                 Choose Seat Number
-                {mode === "payment" && (
-                  <span className="text-[10px] bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded flex items-center gap-1 opacity-60">
-                    <Lock size={10} /> Locked
-                  </span>
-                )}
               </label>
               <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold ring-1 ring-primary/20">
                 Seat: {formData.seatNumber > 0 ? formData.seatNumber : "None"}
@@ -359,13 +332,10 @@ export const StudentForm = ({
                   onClick={() => setFormData({ ...formData, seatNumber: 0 })}
                   className={clsx(
                     "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
-                    mode === "payment" && "cursor-not-allowed",
                     formData.seatNumber === 0
                       ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110"
-                      : clsx(
-                          "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400",
-                          mode !== "payment" && "hover:border-primary/50"
-                        )
+                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-primary/50",
+                    mode === "payment" && "cursor-not-allowed opacity-70"
                   )}
                 >
                   <span className="text-xs font-medium">None</span>
@@ -380,13 +350,10 @@ export const StudentForm = ({
                     onClick={() => setFormData({ ...formData, seatNumber: n })}
                     className={clsx(
                       "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
-                      mode === "payment" && "cursor-not-allowed",
                       formData.seatNumber === n
                         ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110 font-bold"
-                        : clsx(
-                            "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400",
-                            mode !== "payment" && "hover:border-primary/50"
-                          )
+                        : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50",
+                      mode === "payment" && "cursor-not-allowed opacity-70"
                     )}
                   >
                     {n}
@@ -401,7 +368,7 @@ export const StudentForm = ({
 
             <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-2 text-center italic">
               {mode === "payment"
-                ? "Seat editing locked in payment mode"
+                ? "⚠ Seats can only be changed in Personal details mode"
                 : "← Scroll to choose a seat →"}
             </p>
           </div>
