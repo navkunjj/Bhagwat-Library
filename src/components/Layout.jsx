@@ -58,7 +58,7 @@ export const Layout = ({
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-darker text-slate-900 dark:text-gray-100 font-sans selection:bg-primary/30 transition-colors duration-300">
+    <div className="h-screen flex bg-slate-50 dark:bg-darker text-slate-900 dark:text-gray-100 font-sans selection:bg-primary/30 transition-colors duration-300 overflow-hidden">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
