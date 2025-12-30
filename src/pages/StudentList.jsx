@@ -92,7 +92,7 @@ export const StudentList = () => {
 
       {/* Student Table */}
       <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
-        <div className="overflow-x-auto custom-scrollbar max-h-[600px] overflow-y-auto">
+        <div className="overflow-x-auto custom-scrollbar max-h-[calc(100vh-200px)] overflow-y-auto">
           <table className="w-full text-left min-w-[640px]">
             <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
               <tr>

@@ -16,6 +16,7 @@ import {
 } from "../utils/store";
 import { clsx } from "clsx";
 import { StudentForm } from "../components/StudentForm";
+import { StudentProfile } from "../components/StudentProfile";
 import { Loader } from "../components/Loader";
 import { ConfirmModal } from "../components/ConfirmModal";
 
@@ -24,6 +25,7 @@ export const PaymentList = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState("All"); // All, Paid, Unpaid
   const [editingStudent, setEditingStudent] = React.useState(null);
+  const [viewingStudent, setViewingStudent] = React.useState(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [notificationSent, setNotificationSent] = React.useState(null); // { name: '', amount: 0 }
@@ -139,9 +141,9 @@ export const PaymentList = () => {
 
       {/* Payments Table */}
       <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar max-h-[calc(100vh-330px)] overflow-y-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider">
+            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-4 font-medium">Student</th>
                 <th className="px-6 py-4 font-medium">Batch</th>
@@ -172,8 +174,11 @@ export const PaymentList = () => {
                     className="hover:bg-white/5 transition-colors group"
                   >
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 dark:border-white/10">
+                      <div
+                        onClick={() => setViewingStudent(student)}
+                        className="flex items-center gap-3 cursor-pointer group/profile"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 dark:border-white/10 group-hover/profile:border-primary/50 transition-colors">
                           {student.photo ? (
                             <img
                               src={student.photo}
@@ -183,19 +188,28 @@ export const PaymentList = () => {
                           ) : (
                             <Users
                               size={14}
-                              className="text-slate-400 dark:text-gray-400"
+                              className="text-slate-400 dark:text-gray-400 group-hover/profile:text-primary transition-colors"
                             />
                           )}
                         </div>
-                        <span className="font-medium text-slate-900 dark:text-white">
+                        <span className="font-medium text-slate-900 dark:text-white group-hover/profile:text-primary transition-colors">
                           {student.name}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
-                      {Array.isArray(student.batch)
-                        ? student.batch.join(", ")
-                        : student.batch}
+                      <div
+                        className="max-w-[150px] truncate"
+                        title={
+                          Array.isArray(student.batch)
+                            ? student.batch.join(", ")
+                            : student.batch
+                        }
+                      >
+                        {Array.isArray(student.batch)
+                          ? student.batch.join(", ")
+                          : student.batch}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
                       {student.validityFrom && student.validityTo ? (
@@ -287,6 +301,25 @@ export const PaymentList = () => {
           onSuccess={() => {
             loadStudents();
             setIsFormOpen(false);
+          }}
+        />
+      )}
+
+      {/* Profile Modal */}
+      {viewingStudent && (
+        <StudentProfile
+          student={viewingStudent}
+          onClose={() => setViewingStudent(null)}
+          onUpdate={async () => {
+            loadStudents();
+            // Update the viewing student with fresh data
+            const updatedStudents = await getStudents();
+            const updated = updatedStudents.find(
+              (s) => s.id === viewingStudent.id
+            );
+            if (updated) {
+              setViewingStudent(updated);
+            }
           }}
         />
       )}
