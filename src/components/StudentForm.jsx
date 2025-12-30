@@ -328,14 +328,12 @@ export const StudentForm = ({
                 {/* None Option */}
                 <button
                   type="button"
-                  disabled={mode === "payment"}
                   onClick={() => setFormData({ ...formData, seatNumber: 0 })}
                   className={clsx(
                     "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
                     formData.seatNumber === 0
                       ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110"
-                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-primary/50",
-                    mode === "payment" && "cursor-not-allowed opacity-70"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-primary/50"
                   )}
                 >
                   <span className="text-xs font-medium">None</span>
@@ -346,14 +344,12 @@ export const StudentForm = ({
                   <button
                     key={n}
                     type="button"
-                    disabled={mode === "payment"}
                     onClick={() => setFormData({ ...formData, seatNumber: n })}
                     className={clsx(
                       "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
                       formData.seatNumber === n
                         ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110 font-bold"
-                        : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50",
-                      mode === "payment" && "cursor-not-allowed opacity-70"
+                        : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50"
                     )}
                   >
                     {n}
@@ -367,9 +363,7 @@ export const StudentForm = ({
             </div>
 
             <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-2 text-center italic">
-              {mode === "payment"
-                ? "⚠ Seats can only be changed in Personal details mode"
-                : "← Scroll to choose a seat →"}
+              ← Scroll to choose a seat →
             </p>
           </div>
 
