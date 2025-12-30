@@ -145,14 +145,26 @@ export const PaymentList = () => {
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-4 font-medium">Student</th>
-                <th className="px-6 py-4 font-medium">Batch</th>
-                <th className="px-6 py-4 font-medium">Validity</th>
-                <th className="px-6 py-4 font-medium">Total Fee</th>
-                <th className="px-6 py-4 font-medium">Paid</th>
-                <th className="px-6 py-4 font-medium">Balance</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium whitespace-nowrap">
+                  Student
+                </th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">Batch</th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">
+                  Validity
+                </th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">
+                  Total Fee
+                </th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">Paid</th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">
+                  Balance
+                </th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium">
+                  Status
+                </th>
+                <th className="px-3 py-3 md:px-6 md:py-4 font-medium text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -173,10 +185,10 @@ export const PaymentList = () => {
                     key={student.id}
                     className="hover:bg-white/5 transition-colors group"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-3 py-3 md:px-6 md:py-4">
                       <div
                         onClick={() => setViewingStudent(student)}
-                        className="flex items-center gap-3 cursor-pointer group/profile"
+                        className="flex items-center gap-2 md:gap-3 cursor-pointer group/profile"
                       >
                         <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 dark:border-white/10 group-hover/profile:border-primary/50 transition-colors">
                           {student.photo ? (
@@ -192,12 +204,12 @@ export const PaymentList = () => {
                             />
                           )}
                         </div>
-                        <span className="font-medium text-slate-900 dark:text-white group-hover/profile:text-primary transition-colors">
+                        <span className="font-medium text-slate-900 dark:text-white group-hover/profile:text-primary transition-colors whitespace-nowrap text-sm md:text-base">
                           {student.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-slate-500 dark:text-gray-400">
                       <div
                         className="max-w-[150px] truncate"
                         title={
@@ -211,7 +223,7 @@ export const PaymentList = () => {
                           : student.batch}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-slate-500 dark:text-gray-400">
                       {student.validityFrom && student.validityTo ? (
                         <div className="flex flex-col text-xs">
                           <span>{student.validityFrom}</span>
@@ -224,16 +236,16 @@ export const PaymentList = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-slate-900 dark:text-white font-medium">
                       ₹{student.totalAmount || 0}
                     </td>
-                    <td className="px-6 py-4 text-sm text-success">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-success">
                       ₹{student.paidAmount || 0}
                     </td>
-                    <td className="px-6 py-4 text-sm text-danger">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-danger">
                       ₹{balance}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 py-3 md:px-6 md:py-4">
                       <span
                         className={clsx(
                           "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
@@ -245,7 +257,7 @@ export const PaymentList = () => {
                         {status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-3 py-3 md:px-6 md:py-4 text-right">
                       <button
                         onClick={() => {
                           setEditingStudent(student);
