@@ -1,5 +1,27 @@
 import React from "react";
-import { X, Save, Edit2, Camera, Loader2, Lock } from "lucide-react";
+import {
+  Users,
+  Image as ImageIcon,
+  X,
+  CreditCard,
+  Calendar,
+  IndianRupee,
+  Clock,
+  Briefcase,
+  AlertCircle,
+  Phone,
+  FileText,
+  Save,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  Armchair,
+  Lock,
+  Loader2,
+  Camera,
+  Edit2,
+} from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches } from "../utils/store";
 import { CameraCapture } from "./CameraCapture";
