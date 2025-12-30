@@ -311,30 +311,59 @@ export const StudentForm = ({
             </>
           )}
 
-          {/* Seat Number Slider */}
+          {/* Seat Number Scrollable Dial */}
           <div>
-            <div className="flex justify-between items-center mb-1">
+            <div className="flex justify-between items-center mb-2">
               <label className="text-sm font-medium text-slate-500 dark:text-gray-400">
-                Seat Number
+                Choose Seat Number
               </label>
-              <span className="text-sm font-bold text-primary">
-                {formData.seatNumber > 0 ? formData.seatNumber : "None"}
+              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold ring-1 ring-primary/20">
+                Seat: {formData.seatNumber > 0 ? formData.seatNumber : "None"}
               </span>
             </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={formData.seatNumber}
-              onChange={(e) =>
-                setFormData({ ...formData, seatNumber: Number(e.target.value) })
-              }
-              className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
-            />
-            <div className="flex justify-between text-xs text-slate-400 mt-1">
-              <span>None</span>
-              <span>100</span>
+
+            <div className="relative group">
+              <div className="overflow-x-auto custom-scrollbar-hidden py-4 flex gap-3 snap-x scroll-smooth">
+                {/* None Option */}
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, seatNumber: 0 })}
+                  className={clsx(
+                    "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
+                    formData.seatNumber === 0
+                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-primary/50"
+                  )}
+                >
+                  <span className="text-xs font-medium">None</span>
+                </button>
+
+                {/* 1 to 100 */}
+                {Array.from({ length: 100 }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, seatNumber: n })}
+                    className={clsx(
+                      "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
+                      formData.seatNumber === n
+                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110 font-bold"
+                        : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50"
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+
+              {/* Fade masks */}
+              <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white dark:from-[#1e293b] to-transparent pointer-events-none" />
+              <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white dark:from-[#1e293b] to-transparent pointer-events-none" />
             </div>
+
+            <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-2 text-center italic">
+              ← Scroll to choose a seat →
+            </p>
           </div>
 
           {/* Batch Selection - Multi-select for Personal, Read-only for Payment */}
