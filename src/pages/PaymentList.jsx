@@ -143,7 +143,10 @@ export const PaymentList = () => {
       <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300">
         <div className="overflow-x-auto custom-scrollbar max-h-[calc(100vh-330px)] overflow-y-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
+            <thead
+              className=" text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10"
+              style={{ backdropFilter: "blur(10px)" }}
+            >
               <tr>
                 <th className="px-3 py-3 md:px-6 md:py-4 font-medium whitespace-nowrap">
                   Student
