@@ -62,7 +62,8 @@ export const StudentForm = ({
   React.useEffect(() => {
     const paid = Number(formData.paidAmount) || 0;
     const total = Number(formData.totalAmount) || 0;
-    const status = paid >= total && total > 0 ? "Paid" : "Unpaid";
+    const status =
+      paid >= total && total > 0 ? "Paid" : paid > 0 ? "Partial" : "Unpaid";
 
     setFormData((prev) => {
       const updates = {};

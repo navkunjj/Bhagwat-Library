@@ -41,13 +41,15 @@ export const PaymentList = () => {
 
   // Calculate stats
   const totalStudents = students.length;
-  const paidStudents = students.filter((s) => {
-    const status =
-      s.status ||
-      (s.paidAmount >= s.totalAmount && s.totalAmount > 0 ? "Paid" : "Unpaid");
-    return status === "Paid";
-  }).length;
-  const unpaidStudents = totalStudents - paidStudents;
+  const paidStudents = students.filter(
+    (s) => s.paidAmount >= s.totalAmount && s.totalAmount > 0
+  ).length;
+  const partialStudents = students.filter(
+    (s) => s.paidAmount > 0 && s.paidAmount < s.totalAmount
+  ).length;
+  const unpaidStudents = students.filter(
+    (s) => s.paidAmount === 0 || !s.totalAmount
+  ).length;
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch = student.name
@@ -58,6 +60,8 @@ export const PaymentList = () => {
       student.status ||
       (student.paidAmount >= student.totalAmount && student.totalAmount > 0
         ? "Paid"
+        : student.paidAmount > 0
+        ? "Partial"
         : "Unpaid");
     const matchesFilter =
       filterStatus === "All" || studentStatus === filterStatus;
@@ -97,8 +101,21 @@ export const PaymentList = () => {
           </div>
         </div>
         <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger">
+          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl text-yellow-500">
             <AlertCircle size={24} />
+          </div>
+          <div>
+            <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
+              Partial Students
+            </p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {partialStudents}
+            </h3>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
+          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger">
+            <XCircle size={24} />
           </div>
           <div>
             <p className="text-slate-500 dark:text-gray-400 text-sm font-medium">
@@ -177,6 +194,8 @@ export const PaymentList = () => {
                   (student.paidAmount >= student.totalAmount &&
                   student.totalAmount > 0
                     ? "Paid"
+                    : student.paidAmount > 0
+                    ? "Partial"
                     : "Unpaid");
                 const balance = Math.max(
                   0,
@@ -254,6 +273,8 @@ export const PaymentList = () => {
                           "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
                           status === "Paid"
                             ? "bg-success/10 text-success border-success/20"
+                            : status === "Partial"
+                            ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                             : "bg-danger/10 text-danger border-danger/20"
                         )}
                       >

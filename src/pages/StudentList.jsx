@@ -152,6 +152,8 @@ export const StudentList = () => {
                           (student.paidAmount >= student.totalAmount &&
                           student.totalAmount > 0
                             ? "Paid"
+                            : student.paidAmount > 0
+                            ? "Partial"
                             : "Unpaid");
                         return (
                           <span
@@ -159,6 +161,8 @@ export const StudentList = () => {
                               "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
                               status === "Paid"
                                 ? "bg-success/10 text-success border-success/20"
+                                : status === "Partial"
+                                ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                                 : "bg-danger/10 text-danger border-danger/20"
                             )}
                           >

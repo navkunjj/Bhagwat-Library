@@ -103,14 +103,21 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
               <span
                 className={clsx(
                   "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
-                  student.status === "Paid"
+                  student.paidAmount >= student.totalAmount &&
+                    student.totalAmount > 0
                     ? "bg-success/10 text-success border-success/20"
-                    : student.status === "Partial"
+                    : student.paidAmount > 0 &&
+                      student.paidAmount < student.totalAmount
                     ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                     : "bg-danger/10 text-danger border-danger/20"
                 )}
               >
-                {student.status}
+                {student.paidAmount >= student.totalAmount &&
+                student.totalAmount > 0
+                  ? "Paid"
+                  : student.paidAmount > 0
+                  ? "Partial"
+                  : "Unpaid"}
               </span>
               <span className="text-slate-400 dark:text-gray-400 text-sm">
                 • {batchDisplay}
