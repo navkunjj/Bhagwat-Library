@@ -35,7 +35,10 @@ router.post('/', async (req, res) => {
 // PUT update student
 router.put('/:id', async (req, res) => {
     try {
-        console.log('Updating student:', req.body);
+        console.log('Updating student ID:', req.params.id, 'Data:', req.body);
+        if (req.body.seatNumber !== undefined) {
+            console.log('Received seatNumber:', req.body.seatNumber);
+        }
         const updatedStudent = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,

@@ -12,6 +12,7 @@ const StudentSchema = new mongoose.Schema({
     photo: { type: String, default: '' }, // Base64 string
     validityFrom: { type: String, default: '' },
     validityTo: { type: String, default: '' },
+    seatNumber: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Student', StudentSchema);

@@ -39,6 +39,7 @@ export const StudentForm = ({
     photo: student?.photo || "",
     validityFrom: student?.validityFrom || "",
     validityTo: student?.validityTo || "",
+    seatNumber: student?.seatNumber || 0,
   });
 
   // Calculate total fee based on selected batches
@@ -309,6 +310,32 @@ export const StudentForm = ({
               </div>
             </>
           )}
+
+          {/* Seat Number Slider */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-sm font-medium text-slate-500 dark:text-gray-400">
+                Seat Number
+              </label>
+              <span className="text-sm font-bold text-primary">
+                {formData.seatNumber > 0 ? formData.seatNumber : "None"}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={formData.seatNumber}
+              onChange={(e) =>
+                setFormData({ ...formData, seatNumber: Number(e.target.value) })
+              }
+              className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+            />
+            <div className="flex justify-between text-xs text-slate-400 mt-1">
+              <span>None</span>
+              <span>100</span>
+            </div>
+          </div>
 
           {/* Batch Selection - Multi-select for Personal, Read-only for Payment */}
           <div>

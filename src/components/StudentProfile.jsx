@@ -9,6 +9,7 @@ import {
   Edit2,
   Check,
   XCircle,
+  Armchair,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { updateStudentPayment, calculateValidity } from "../utils/store";
@@ -141,6 +142,18 @@ export const StudentProfile = ({ student, onClose, onUpdate }) => {
                 </p>
                 <p className="font-medium text-slate-900 dark:text-white">
                   {student.admissionDate}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Armchair size={18} className="mt-1 text-primary" />
+              <div>
+                <p className="text-xs text-slate-400 dark:text-gray-500">
+                  Seat Number
+                </p>
+                <p className="font-medium text-slate-900 dark:text-white">
+                  {student.seatNumber > 0 ? student.seatNumber : "Not assigned"}
                 </p>
               </div>
             </div>
