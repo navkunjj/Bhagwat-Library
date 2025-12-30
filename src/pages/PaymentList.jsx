@@ -198,7 +198,17 @@ export const PaymentList = () => {
                         : student.batch}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-500 dark:text-gray-400">
-                      {calculateValidity(student.admissionDate)}
+                      {student.validityFrom && student.validityTo ? (
+                        <div className="flex flex-col text-xs">
+                          <span>{student.validityFrom}</span>
+                          <span className="text-slate-300">to</span>
+                          <span>{student.validityTo}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 italic text-xs">
+                          Not set
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
                       ₹{student.totalAmount || 0}

@@ -59,7 +59,7 @@ export const deleteBatch = async (id) => {
 
 export const getStudents = async () => {
     try {
-        const res = await fetch(`${API_URL}/students`);
+        const res = await fetch(`${API_URL}/students`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch students');
         return await res.json();
     } catch (err) {

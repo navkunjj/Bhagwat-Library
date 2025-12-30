@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Save, Edit2, Camera } from "lucide-react";
+import { X, Save, Edit2, Camera, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches } from "../utils/store";
 import { CameraCapture } from "./CameraCapture";
@@ -12,6 +12,7 @@ export const StudentForm = ({
 }) => {
   const [batches, setBatches] = React.useState([]);
   const [isCameraOpen, setIsCameraOpen] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Load batches first
   React.useEffect(() => {
@@ -36,6 +37,8 @@ export const StudentForm = ({
     totalAmount: student?.totalAmount || "",
     status: student?.status || "Unpaid",
     photo: student?.photo || "",
+    validityFrom: student?.validityFrom || "",
+    validityTo: student?.validityTo || "",
   });
 
   // Calculate total fee based on selected batches
@@ -54,15 +57,54 @@ export const StudentForm = ({
     }
   }, [formData.batch, batches]);
 
-  // Calculate status dynamically
+  // Calculate status dynamically & Auto-set Validity
   React.useEffect(() => {
     const paid = Number(formData.paidAmount) || 0;
     const total = Number(formData.totalAmount) || 0;
     const status = paid >= total && total > 0 ? "Paid" : "Unpaid";
-    if (formData.status !== status) {
-      setFormData((prev) => ({ ...prev, status }));
-    }
+
+    setFormData((prev) => {
+      const updates = {};
+      if (prev.status !== status) {
+        updates.status = status;
+      }
+
+      // Auto-calculate validity when status becomes pure "Paid" (and it wasn't before effectively, or just constantly update if matches logic?)
+      // Requirement: "validity one month after from that to that"
+      // Let's do it when condition is met and fields are empty OR just when paid matches total.
+      // To avoid annoying overwrites, we can check if it's a fresh change or user input.
+      // But user requested "add validity one month after".
+      // Simple UX: If paid >= total, and validity dates are not set (or we want to suggest them), set them.
+      // Let's do: If status is Paid, and validityFrom is empty, set Today. If validityTo is empty, set Today + 1 month.
+
+      if (status === "Paid" && (!prev.validityFrom || !prev.validityTo)) {
+        const today = new Date();
+        const nextMonth = new Date(today);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        if (!prev.validityFrom)
+          updates.validityFrom = today.toISOString().split("T")[0];
+        if (!prev.validityTo)
+          updates.validityTo = nextMonth.toISOString().split("T")[0];
+      }
+
+      return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
+    });
   }, [formData.paidAmount, formData.totalAmount]);
+
+  // Auto-calculate Validity To when From changes
+  React.useEffect(() => {
+    if (formData.validityFrom) {
+      const fromDate = new Date(formData.validityFrom);
+      const toDate = new Date(fromDate);
+      toDate.setMonth(toDate.getMonth() + 1);
+
+      const newToDate = toDate.toISOString().split("T")[0];
+      if (formData.validityTo !== newToDate) {
+        setFormData((prev) => ({ ...prev, validityTo: newToDate }));
+      }
+    }
+  }, [formData.validityFrom]);
 
   const handleBatchToggle = (batchTime) => {
     setFormData((prev) => {
@@ -95,15 +137,24 @@ export const StudentForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
-      ...formData,
-      id: student?.id,
-      paidAmount: Number(formData.paidAmount),
-      totalAmount: Number(formData.totalAmount),
-    };
-    await saveStudent(data);
-    onSuccess();
-    onClose();
+    setIsSubmitting(true);
+    try {
+      const data = {
+        ...formData,
+        id: student?.id,
+        paidAmount: Number(formData.paidAmount),
+        totalAmount: Number(formData.totalAmount),
+      };
+      console.log("Sending data:", data);
+      await saveStudent(data);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("Error saving student:", error);
+      alert("Failed to save student. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const restFee = Math.max(
@@ -326,7 +377,33 @@ export const StudentForm = ({
               />
             </div>
 
-            {/* Hidden logic block for previous mode check removal */}
+            {/* Validity Dates - Visible if fields exist or manually added */}
+            <div>
+              <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
+                Validity From
+              </label>
+              <input
+                type="date"
+                value={formData.validityFrom}
+                onChange={(e) =>
+                  setFormData({ ...formData, validityFrom: e.target.value })
+                }
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-500 dark:text-gray-400 mb-1">
+                Validity To
+              </label>
+              <input
+                type="date"
+                value={formData.validityTo}
+                onChange={(e) =>
+                  setFormData({ ...formData, validityTo: e.target.value })
+                }
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+            </div>
           </div>
 
           <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-4 flex items-center justify-between border border-slate-100 dark:border-none">
@@ -356,10 +433,20 @@ export const StudentForm = ({
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95"
             >
-              <Save size={18} />
-              <span className="ml-2">Save Student</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="ml-2">Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  <span className="ml-2">Save Student</span>
+                </>
+              )}
             </button>
           </div>
         </form>

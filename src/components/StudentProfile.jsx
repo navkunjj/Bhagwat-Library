@@ -149,10 +149,20 @@ export const StudentProfile = ({ student, onClose, onUpdate }) => {
               <Calendar size={18} className="mt-1 text-primary" />
               <div>
                 <p className="text-xs text-slate-400 dark:text-gray-500">
-                  Validity (1 Month)
+                  Validity
                 </p>
-                <p className="font-medium text-success">
-                  {calculateValidity(student.admissionDate)}
+                <p className="font-medium text-slate-900 dark:text-white">
+                  {student.validityFrom && student.validityTo ? (
+                    <span className="text-sm">
+                      {student.validityFrom}{" "}
+                      <span className="text-slate-400">to</span>{" "}
+                      {student.validityTo}
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic text-sm">
+                      Not set
+                    </span>
+                  )}
                 </p>
               </div>
             </div>

@@ -17,13 +17,17 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+
 // POST new student
 router.post('/', async (req, res) => {
     try {
+        console.log('Creating student:', req.body);
         const newStudent = new Student(req.body);
         const savedStudent = await newStudent.save();
         res.status(201).json({ ...savedStudent._doc, id: savedStudent._id });
     } catch (err) {
+        console.error('Error creating student:', err);
         res.status(400).json({ message: err.message });
     }
 });
@@ -31,6 +35,7 @@ router.post('/', async (req, res) => {
 // PUT update student
 router.put('/:id', async (req, res) => {
     try {
+        console.log('Updating student:', req.body);
         const updatedStudent = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,

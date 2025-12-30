@@ -10,6 +10,8 @@ const StudentSchema = new mongoose.Schema({
     totalAmount: { type: Number, default: 0 },
     status: { type: String, default: 'Unpaid' },
     photo: { type: String, default: '' }, // Base64 string
+    validityFrom: { type: String, default: '' },
+    validityTo: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Student', StudentSchema);
