@@ -112,7 +112,7 @@ export const PaymentList = () => {
       </div>
 
       {/* Header & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-20 bg-slate-50 dark:bg-darker -mx-4 -mt-4 px-4 pt-8 pb-4 lg:-mx-8 lg:-mt-8 lg:px-8 lg:pt-12 lg:pb-8 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-20 bg-slate-50 dark:bg-darker -mt-4 pt-4 pb-4 shadow-sm">
         <div className="relative flex-1 max-w-md">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
