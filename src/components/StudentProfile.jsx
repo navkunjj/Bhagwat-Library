@@ -10,14 +10,17 @@ import {
   Check,
   XCircle,
   Armchair,
+  FileText,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { updateStudentPayment, calculateValidity } from "../utils/store";
+import { Invoice } from "./Invoice";
 
 export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
   const [isEditingPayment, setIsEditingPayment] = React.useState(false);
   const [paidAmount, setPaidAmount] = React.useState(student?.paidAmount || 0);
   const [error, setError] = React.useState("");
+  const [showInvoice, setShowInvoice] = React.useState(false);
 
   if (!student) return null;
 
@@ -62,6 +65,13 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
         {/* Header */}
         <div className="relative">
           <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <button
+              onClick={() => setShowInvoice(true)}
+              className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+              title="View Invoice"
+            >
+              <FileText size={20} />
+            </button>
             <button
               onClick={onEdit}
               className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
@@ -292,6 +302,10 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
           </div>
         </div>
       </div>
+
+      {showInvoice && (
+        <Invoice student={student} onClose={() => setShowInvoice(false)} />
+      )}
     </div>
   );
 };

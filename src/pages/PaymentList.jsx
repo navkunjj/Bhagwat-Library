@@ -8,6 +8,7 @@ import {
   Bell,
   Check,
   XCircle,
+  FileText,
 } from "lucide-react";
 import {
   getStudents,
@@ -17,6 +18,7 @@ import {
 import { clsx } from "clsx";
 import { StudentForm } from "../components/StudentForm";
 import { StudentProfile } from "../components/StudentProfile";
+import { Invoice } from "../components/Invoice";
 import { Loader } from "../components/Loader";
 import { ConfirmModal } from "../components/ConfirmModal";
 
@@ -29,6 +31,7 @@ export const PaymentList = () => {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [notificationSent, setNotificationSent] = React.useState(null); // { name: '', amount: 0 }
+  const [invoiceStudent, setInvoiceStudent] = React.useState(null);
 
   const loadStudents = async () => {
     setStudents(await getStudents());
@@ -331,20 +334,28 @@ export const PaymentList = () => {
                       >
                         <Edit2 size={16} />
                       </button>
-                      {status === "Unpaid" && balance > 0 && (
-                        <button
-                          onClick={() => {
-                            setNotificationSent({
-                              name: student.name,
-                              amount: balance,
-                            });
-                          }}
-                          className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors"
-                          title="Send Notification"
-                        >
-                          <Bell size={16} />
-                        </button>
-                      )}
+                      {(status === "Unpaid" || status === "Partial") &&
+                        balance > 0 && (
+                          <button
+                            onClick={() => {
+                              setNotificationSent({
+                                name: student.name,
+                                amount: balance,
+                              });
+                            }}
+                            className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors"
+                            title="Send Notification"
+                          >
+                            <Bell size={16} />
+                          </button>
+                        )}
+                      <button
+                        onClick={() => setInvoiceStudent(student)}
+                        className="p-2 text-slate-400 dark:text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        title="View Invoice"
+                      >
+                        <FileText size={16} />
+                      </button>
                     </td>
                   </tr>
                 );
@@ -407,12 +418,20 @@ export const PaymentList = () => {
       <ConfirmModal
         isOpen={!!notificationSent}
         onClose={() => setNotificationSent(null)}
+        onConfirm={() => setNotificationSent(null)}
         title="Notification Sent"
         message={`Success! A notification has been sent to ${notificationSent?.name} regarding their pending balance of ₹${notificationSent?.amount}.`}
         confirmText="Got it"
         variant="success"
         showCancel={false}
       />
+
+      {invoiceStudent && (
+        <Invoice
+          student={invoiceStudent}
+          onClose={() => setInvoiceStudent(null)}
+        />
+      )}
     </div>
   );
 };
