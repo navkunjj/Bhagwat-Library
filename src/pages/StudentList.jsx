@@ -14,6 +14,7 @@ export const StudentList = () => {
   const [editingStudent, setEditingStudent] = React.useState(null);
   const [viewingStudent, setViewingStudent] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const [filterBatch, setFilterBatch] = React.useState("All");
   const [studentToDelete, setStudentToDelete] = React.useState(null);
 
@@ -28,9 +29,14 @@ export const StudentList = () => {
 
   const handleDelete = async () => {
     if (studentToDelete) {
-      await deleteStudent(studentToDelete);
-      loadStudents();
-      setStudentToDelete(null);
+      setIsDeleting(true);
+      try {
+        await deleteStudent(studentToDelete);
+        await loadStudents();
+      } finally {
+        setIsDeleting(false);
+        setStudentToDelete(null);
+      }
     }
   };
 
@@ -94,7 +100,13 @@ export const StudentList = () => {
       <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
         <div className="overflow-x-auto custom-scrollbar max-h-[calc(100vh-200px)] overflow-y-auto">
           <table className="w-full text-left min-w-[640px]">
-            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10">
+            <thead
+              className=" text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10"
+              style={{
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 0px 10px 1px rgba(255, 255, 255, 0.1) inset",
+              }}
+            >
               <tr>
                 <th className="px-4 md:px-6 py-4 font-medium">Student</th>
                 <th className="px-4 md:px-6 py-4 font-medium">Phone</th>
@@ -253,11 +265,12 @@ export const StudentList = () => {
 
       <ConfirmModal
         isOpen={!!studentToDelete}
-        onClose={() => setStudentToDelete(null)}
+        onClose={() => !isDeleting && setStudentToDelete(null)}
         onConfirm={handleDelete}
         title="Delete Student"
         message="Are you sure you want to delete this student? This action cannot be undone."
         confirmText="Delete Student"
+        isLoading={isDeleting}
       />
     </div>
   );

@@ -73,9 +73,17 @@ export const PaymentList = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+        <button
+          onClick={() => setFilterStatus("All")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "All"
+              ? "border-primary ring-2 ring-primary/20"
+              : "border-slate-200 dark:border-white/5 hover:border-primary/50"
+          )}
+        >
+          <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl text-primary font-bold">
             <Users size={24} />
           </div>
           <div>
@@ -86,9 +94,18 @@ export const PaymentList = () => {
               {totalStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-success/10 dark:bg-success/20 rounded-xl text-success">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Paid")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Paid"
+              ? "border-success ring-2 ring-success/20"
+              : "border-slate-200 dark:border-white/5 hover:border-success/50"
+          )}
+        >
+          <div className="p-3 bg-success/10 dark:bg-success/20 rounded-xl text-success font-bold">
             <Receipt size={24} />
           </div>
           <div>
@@ -99,9 +116,18 @@ export const PaymentList = () => {
               {paidStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl text-yellow-500">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Partial")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Partial"
+              ? "border-yellow-500 ring-2 ring-yellow-500/20"
+              : "border-slate-200 dark:border-white/5 hover:border-yellow-500/50"
+          )}
+        >
+          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl text-yellow-500 font-bold">
             <AlertCircle size={24} />
           </div>
           <div>
@@ -112,9 +138,18 @@ export const PaymentList = () => {
               {partialStudents}
             </h3>
           </div>
-        </div>
-        <div className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300">
-          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger">
+        </button>
+
+        <button
+          onClick={() => setFilterStatus("Unpaid")}
+          className={clsx(
+            "bg-white dark:bg-card border p-6 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none transition-all duration-300 text-left",
+            filterStatus === "Unpaid"
+              ? "border-danger ring-2 ring-danger/20"
+              : "border-slate-200 dark:border-white/5 hover:border-danger/50"
+          )}
+        >
+          <div className="p-3 bg-danger/10 dark:bg-danger/20 rounded-xl text-danger font-bold">
             <XCircle size={24} />
           </div>
           <div>
@@ -125,7 +160,7 @@ export const PaymentList = () => {
               {unpaidStudents}
             </h3>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Header & Filters */}
@@ -151,6 +186,7 @@ export const PaymentList = () => {
           >
             <option value="All">All Status</option>
             <option value="Paid">Paid</option>
+            <option value="Partial">Partial</option>
             <option value="Unpaid">Unpaid</option>
           </select>
         </div>
@@ -162,7 +198,10 @@ export const PaymentList = () => {
           <table className="w-full text-left">
             <thead
               className=" text-slate-500 dark:text-gray-400 text-xs uppercase tracking-wider sticky top-0 z-10"
-              style={{ backdropFilter: "blur(10px)" }}
+              style={{
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 0px 10px 1px rgba(255, 255, 255, 0.1) inset",
+              }}
             >
               <tr>
                 <th className="px-3 py-3 md:px-6 md:py-4 font-medium whitespace-nowrap">

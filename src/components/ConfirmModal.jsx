@@ -12,6 +12,8 @@ export const ConfirmModal = ({
   cancelText = "Cancel",
   variant = "danger",
   showCancel = true,
+  isLoading = false,
+  loadingText = "Deleting...",
 }) => {
   if (!isOpen) return null;
 
@@ -55,18 +57,25 @@ export const ConfirmModal = ({
             {showCancel && (
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                disabled={isLoading}
+                className={clsx(
+                  "flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-all",
+                  isLoading && "opacity-50 cursor-not-allowed"
+                )}
               >
                 {cancelText}
               </button>
             )}
             <button
               onClick={() => {
-                onConfirm?.();
-                onClose();
+                if (!isLoading) {
+                  onConfirm?.();
+                }
               }}
+              disabled={isLoading}
               className={clsx(
-                "flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-all active:scale-95 shadow-lg",
+                "flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2",
+                isLoading && "opacity-70 cursor-not-allowed",
                 variant === "danger"
                   ? "bg-danger hover:bg-danger/90 shadow-danger/20"
                   : variant === "success"
@@ -74,7 +83,14 @@ export const ConfirmModal = ({
                   : "bg-primary hover:bg-primary/90 shadow-primary/20"
               )}
             >
-              {confirmText}
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>{loadingText}</span>
+                </>
+              ) : (
+                confirmText
+              )}
             </button>
           </div>
         </div>
