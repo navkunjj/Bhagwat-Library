@@ -15,7 +15,6 @@ export const StudentList = () => {
   const [viewingStudent, setViewingStudent] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [filterBatch, setFilterBatch] = React.useState("All");
-  const [filterStatus, setFilterStatus] = React.useState("All");
   const [studentToDelete, setStudentToDelete] = React.useState(null);
 
   const loadStudents = async () => {
@@ -47,18 +46,14 @@ export const StudentList = () => {
       // const batchStr = Array.isArray(student.batch) ? student.batch.join(" ") : student.batch;
       // ... includes(searchTerm) ...
 
-      // Filter by Status
-      const studentStatus =
-        student.status ||
-        (student.paidAmount >= student.totalAmount && student.totalAmount > 0
-          ? "Paid"
-          : student.paidAmount > 0
-          ? "Partial"
-          : "Unpaid");
-      const matchesStatus =
-        filterStatus === "All" || studentStatus === filterStatus;
+      // Filter by Batch
+      const matchesBatch =
+        filterBatch === "All" ||
+        (Array.isArray(student.batch)
+          ? student.batch.includes(filterBatch)
+          : student.batch === filterBatch);
 
-      return matchesSearch && matchesBatch && matchesStatus;
+      return matchesSearch && matchesBatch;
     })
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -82,22 +77,12 @@ export const StudentList = () => {
           />
         </div>
         <div className="flex items-center gap-3">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer appearance-none shadow-sm dark:shadow-none"
-          >
-            <option value="All">All Status</option>
-            <option value="Paid">Paid</option>
-            <option value="Partial">Partial</option>
-            <option value="Unpaid">Unpaid</option>
-          </select>
           <button
             onClick={() => {
               setEditingStudent(null);
               setIsFormOpen(true);
             }}
-            className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap"
+            className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all active:scale-95"
           >
             <Plus size={20} />
             <span className="hidden sm:inline">Add Student</span>

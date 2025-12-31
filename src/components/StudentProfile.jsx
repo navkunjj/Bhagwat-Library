@@ -57,8 +57,8 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
   const balance = Math.max(0, student.totalAmount - paidAmount);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar transition-colors duration-300">
         {/* Header */}
         <div className="relative">
           <div className="absolute top-4 right-4 z-10 flex gap-2">
@@ -78,7 +78,7 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
           </div>
           <div className="h-32 bg-gradient-to-r from-primary/10 to-purple-500/10 dark:from-primary/20 dark:to-purple-500/20 w-full" />
           <div className="absolute -bottom-12 left-6">
-            <div className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 bg-white dark:bg-slate-900 overflow-hidden flex items-center justify-center shadow-lg">
+            <div className="w-24 h-24 rounded-full border-4 border-white dark:border-[#1e293b] bg-white dark:bg-[#1e293b] overflow-hidden flex items-center justify-center shadow-lg transition-colors">
               {student.photo ? (
                 <img
                   src={student.photo}
@@ -145,7 +145,7 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
                   Address
                 </p>
                 <p className="font-medium text-slate-900 dark:text-white">
-                  {student.address || "No address provided"}
+                  {student.address}
                 </p>
               </div>
             </div>
@@ -157,7 +157,7 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
                   Admission Date
                 </p>
                 <p className="font-medium text-slate-900 dark:text-white">
-                  {student.admissionDate || "Not mentioned"}
+                  {student.admissionDate}
                 </p>
               </div>
             </div>
