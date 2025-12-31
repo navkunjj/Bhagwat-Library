@@ -38,6 +38,21 @@ router.post('/', async (req, res) => {
     }
 });
 
+// PUT update batch
+router.put('/:id', async (req, res) => {
+    try {
+        const updatedBatch = await Batch.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+        if (!updatedBatch) return res.status(404).json({ message: 'Batch not found' });
+        res.json({ ...updatedBatch._doc, id: updatedBatch._id });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // DELETE batch
 router.delete('/:id', async (req, res) => {
     try {

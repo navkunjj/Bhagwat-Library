@@ -1,6 +1,6 @@
 import React from "react";
 import { Users, CreditCard, AlertCircle } from "lucide-react";
-import { getStudents } from "../utils/store";
+import { getDashboardStats } from "../utils/store";
 import { clsx } from "clsx";
 import { Loader } from "../components/Loader";
 
@@ -40,13 +40,13 @@ export const Dashboard = ({ onTabChange }) => {
 
   React.useEffect(() => {
     const fetchStats = async () => {
-      const students = await getStudents();
-      const total = students.length;
-      const paid = students.filter((s) => s.status === "Paid").length;
-      const unpaid = students.filter((s) => s.status === "Unpaid").length;
-
-      setStats({ total, paid, unpaid });
-      setRecentStudents(students.slice(0, 5)); // Show top 5
+      const { stats, recentStudents } = await getDashboardStats();
+      setStats({
+        total: stats.totalStudents,
+        paid: stats.paidStudents,
+        unpaid: stats.unpaidStudents + (stats.partialStudents || 0),
+      });
+      setRecentStudents(recentStudents);
       setLoading(false);
     };
     fetchStats();

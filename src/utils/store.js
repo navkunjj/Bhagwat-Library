@@ -1,4 +1,28 @@
-const API_URL = 'https://bhagwat-library.onrender.com/api';
+const API_URL = 'http://localhost:5000/api';
+
+// --- Dashboard ---
+
+export const getDashboardStats = async () => {
+    try {
+        const res = await fetch(`${API_URL}/dashboard`);
+        if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+        return await res.json();
+    } catch (err) {
+        console.error(err);
+        return { stats: { totalStudents: 0, paidStudents: 0, unpaidStudents: 0, partialStudents: 0, totalRevenue: 0 }, recentStudents: [] };
+    }
+};
+
+export const getPayments = async (status = 'All') => {
+    try {
+        const res = await fetch(`${API_URL}/payments?status=${status}`);
+        if (!res.ok) throw new Error('Failed to fetch payments');
+        return await res.json();
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
 
 // --- Batches ---
 
@@ -15,27 +39,11 @@ export const getBatches = async () => {
 
 export const saveBatch = async (batch) => {
     try {
-        // If batch has an ID, it's potentially an update, but currently frontend might send partial objects or just create new.
-        // Backend handles ID. Since our batch logic on frontend was: if ID matches update, else push.
-        // For simplicity, batches in this app seem to be "created" mostly. Editing might be rare or implemented as delete/create.
-        // We'll assume POST for new. If ID exists, we might need logic.
-        // Actually, the previous store.js handled update if ID existed.
+        const method = batch.id ? 'PUT' : 'POST';
+        const url = batch.id ? `${API_URL}/batches/${batch.id}` : `${API_URL}/batches`;
 
-        /* 
-           Previous store.js logic:
-           if (batch.id) { index... update } else { push }
-        */
-
-        /* Note: Backend routes only had POST (create) and DELETE.
-           I should check if I added PUT for batches. I did NOT.
-           I will assume mostly creating/deleting for batches for now or update backend later if needed.
-           Actually, the UI usually just adds or removes batches in simple apps.
-           Let's just use POST for now. If ID is present, we might need to add PUT route.
-           Checking previous BatchList might reveal usage.
-           Assuming create for now.
-        */
-        const res = await fetch(`${API_URL}/batches`, {
-            method: 'POST',
+        const res = await fetch(url, {
+            method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(batch)
         });
