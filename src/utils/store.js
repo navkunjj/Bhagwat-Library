@@ -1,4 +1,11 @@
-const API_URL = 'http://localhost:5000/api';
+const isLocal = window.location.hostname === 'localhost' ||
+    window.location.hostname.match(/^192\.168\./) ||
+    window.location.hostname.match(/^10\./) ||
+    window.location.hostname.match(/^127\./);
+
+const API_URL = isLocal
+    ? `http://${window.location.hostname}:5000/api`
+    : 'https://bhagwat-library.onrender.com/api';
 
 // --- Dashboard ---
 
