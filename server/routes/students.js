@@ -2,24 +2,31 @@ const express = require('express');
 const router = express.Router();
 const Student = require('../models/Student');
 
-// GET all students
+// ✅ GET students (load 8 at a time)
 router.get('/', async (req, res) => {
     try {
-        const students = await Student.find().sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
+
+        const students = await Student.find({}, '-photo') // exclude Base64 photo for speed
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+
         // Map _id to id for frontend compatibility
         const formattedStudents = students.map(s => ({
-            ...s._doc,
+            ...s,
             id: s._id
         }));
+
         res.json(formattedStudents);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-
-
-// POST new student
+// ✅ POST new student
 router.post('/', async (req, res) => {
     try {
         console.log('Creating student:', req.body);
@@ -32,26 +39,28 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT update student
+// ✅ PUT update student
 router.put('/:id', async (req, res) => {
     try {
         console.log('Updating student ID:', req.params.id, 'Data:', req.body);
-        if (req.body.seatNumber !== undefined) {
-            console.log('Received seatNumber:', req.body.seatNumber);
-        }
+
         const updatedStudent = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,
             { new: true }
         );
-        if (!updatedStudent) return res.status(404).json({ message: 'Student not found' });
+
+        if (!updatedStudent) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
         res.json({ ...updatedStudent._doc, id: updatedStudent._id });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 });
 
-// DELETE student
+// ✅ DELETE student
 router.delete('/:id', async (req, res) => {
     try {
         await Student.findByIdAndDelete(req.params.id);
