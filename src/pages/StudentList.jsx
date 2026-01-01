@@ -108,7 +108,12 @@ export const StudentList = () => {
               }}
             >
               <tr>
-                <th className="px-4 md:px-6 py-4 font-medium">Student</th>
+                <th className="pl-4 pr-1 py-4 md:pl-6 md:pr-2 font-medium text-slate-400 w-8 text-center">
+                  #
+                </th>
+                <th className="pl-1 pr-4 md:pl-2 md:pr-6 py-4 font-medium">
+                  Student
+                </th>
                 <th className="px-4 md:px-6 py-4 font-medium">Phone</th>
                 <th className="px-4 md:px-6 py-4 font-medium">Admission</th>
                 <th className="px-4 md:px-6 py-4 font-medium">Status</th>
@@ -119,13 +124,16 @@ export const StudentList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {filteredStudents.map((student) => {
+              {filteredStudents.map((student, index) => {
                 return (
                   <tr
                     key={student.id}
                     className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors group"
                   >
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="pl-4 pr-1 py-4 md:pl-6 md:pr-2 text-[10px] font-bold text-slate-400/60 italic text-center">
+                      {index + 1}
+                    </td>
+                    <td className="pl-1 pr-4 md:pl-2 md:pr-6 py-4">
                       <div
                         onClick={() => setViewingStudent(student)}
                         className="flex items-center gap-3 cursor-pointer group/profile"
@@ -211,7 +219,7 @@ export const StudentList = () => {
               {filteredStudents.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     <div className="flex flex-col items-center justify-center gap-2">

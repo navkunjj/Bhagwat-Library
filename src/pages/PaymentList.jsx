@@ -9,6 +9,10 @@ import {
   Check,
   XCircle,
   FileText,
+  Send,
+  MessageSquare,
+  Zap,
+  Loader2,
 } from "lucide-react";
 import {
   getStudents,
@@ -32,6 +36,98 @@ export const PaymentList = () => {
   const [loading, setLoading] = React.useState(true);
   const [notificationSent, setNotificationSent] = React.useState(null); // { name: '', amount: 0 }
   const [invoiceStudent, setInvoiceStudent] = React.useState(null);
+  const [isBulkProcessing, setIsBulkProcessing] = React.useState(false);
+  const [bulkStatus, setBulkStatus] = React.useState("");
+
+  // States for custom confirmation modal
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
+  const [confirmModalTitle, setConfirmModalTitle] = React.useState("");
+  const [confirmModalMessage, setConfirmModalMessage] = React.useState("");
+  const [confirmModalAction, setConfirmModalAction] = React.useState(null);
+  const [bulkActionType, setBulkActionType] = React.useState(null);
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const getWhatsAppMessage = (student, type) => {
+    const balance = Math.max(
+      0,
+      (student.totalAmount || 0) - (student.paidAmount || 0)
+    );
+
+    if (type === "invoice") {
+      return `*Official Invoice - Bhagwat Library*%0A---------------------------%0A*Name:* ${
+        student.name
+      }%0A*Month:* ${today}%0A*Seat:* ${
+        student.seatNumber || "N/A"
+      }%0A*Total:* ₹${student.totalAmount}%0A*Paid:* ₹${
+        student.paidAmount
+      }%0A*Balance:* ₹${balance}%0A*Status:* ${
+        balance === 0 ? "Fully Paid" : "Pending"
+      }%0A---------------------------%0A_Thank you for being a part of Bhagwat Library!_`;
+    } else {
+      return `*Fee Reminder - Bhagwat Library*%0A---------------------------%0AHello *${student.name}*,%0A%0AThis is a friendly reminder regarding your library fee. Our records show a pending balance of *₹${balance}* for the current month.%0A%0APlease clear the amount at your earliest convenience to continue enjoying our services.%0A%0A_If you have already paid, please ignore this message._%0A---------------------------%0A*Thank you!*`;
+    }
+  };
+
+  const shareOnWhatsApp = (student, type) => {
+    const phone = student.phone.replace(/[^0-9]/g, "");
+    const formattedPhone = phone.length === 10 ? `91${phone}` : phone;
+    const message = getWhatsAppMessage(student, type);
+    window.open(`https://wa.me/${formattedPhone}?text=${message}`, "_blank");
+  };
+
+  const handleBulkNotification = async (type) => {
+    const studentsToNotify =
+      type === "reminder"
+        ? students.filter(
+            (s) => s.paidAmount < s.totalAmount && s.totalAmount > 0
+          )
+        : students.filter((s) => s.totalAmount > 0);
+
+    if (studentsToNotify.length === 0) {
+      setBulkActionType("empty");
+      setConfirmModalTitle("No Students Found");
+      setConfirmModalMessage(
+        `There are currently no students that match the criteria for sending ${
+          type === "reminder" ? "fee reminders" : "invoices"
+        }.`
+      );
+      setConfirmModalAction(() => () => setIsConfirmModalOpen(false));
+      setIsConfirmModalOpen(true);
+      return;
+    }
+
+    setBulkStatus(`Sending to ${studentsToNotify.length} students...`);
+    setBulkActionType(type);
+    setConfirmModalTitle(
+      `Confirm Bulk ${type === "reminder" ? "Reminders" : "Invoices"}`
+    );
+    setConfirmModalMessage(
+      `Are you sure you want to send ${
+        type === "reminder" ? "fee reminders" : "invoices"
+      } to ${studentsToNotify.length} students? This action cannot be undone.`
+    );
+    setConfirmModalAction(() => async () => {
+      setIsConfirmModalOpen(false);
+      setBulkStatus(`Sending to ${studentsToNotify.length} students...`);
+      setIsBulkProcessing(true);
+
+      // Placeholder for future WhatsApp API integration
+      setTimeout(() => {
+        setIsBulkProcessing(false);
+        setBulkStatus("");
+        setNotificationSent({
+          name: `all ${studentsToNotify.length} students`,
+          amount: type === "reminder" ? "Reminders" : "Invoices",
+          isBulk: true,
+        });
+      }, 1500);
+    });
+    setIsConfirmModalOpen(true);
+  };
 
   const loadStudents = async () => {
     setStudents(await getStudents());
@@ -167,31 +263,58 @@ export const PaymentList = () => {
       </div>
 
       {/* Header & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search by name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600 shadow-sm dark:shadow-none"
-          />
-        </div>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-4 flex-1">
+          <div className="relative w-full md:max-w-xs">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search students..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white dark:bg-card border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
+            />
+          </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-white dark:bg-card border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer appearance-none shadow-sm dark:shadow-none"
+            className="w-full md:w-auto bg-white dark:bg-card border border-slate-200 dark:border-white/5 text-slate-900 dark:text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer shadow-sm"
           >
             <option value="All">All Status</option>
             <option value="Paid">Paid</option>
             <option value="Partial">Partial</option>
             <option value="Unpaid">Unpaid</option>
           </select>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 no-scrollbar">
+          <button
+            onClick={() => handleBulkNotification("reminder")}
+            disabled={isBulkProcessing}
+            className="flex-shrink-0 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-yellow-500/10 active:scale-95 disabled:opacity-50"
+          >
+            {isBulkProcessing && bulkStatus.includes("reminder") ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Bell size={14} />
+            )}
+            <span className="whitespace-nowrap">Notify Unpaid</span>
+          </button>
+          <button
+            onClick={() => handleBulkNotification("invoice")}
+            disabled={isBulkProcessing}
+            className="flex-shrink-0 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/10 active:scale-95 disabled:opacity-50"
+          >
+            {isBulkProcessing && bulkStatus.includes("invoice") ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <MessageSquare size={14} />
+            )}
+            <span className="whitespace-nowrap">Send Invoices</span>
+          </button>
         </div>
       </div>
 
@@ -207,7 +330,10 @@ export const PaymentList = () => {
               }}
             >
               <tr>
-                <th className="px-3 py-3 md:px-6 md:py-4 font-medium whitespace-nowrap">
+                <th className="pl-4 pr-1 py-3 md:pl-6 md:pr-2 md:py-4 font-medium text-slate-400 w-8 text-center">
+                  #
+                </th>
+                <th className="pl-1 pr-3 py-3 md:pl-2 md:pr-6 md:py-4 font-medium whitespace-nowrap text-left">
                   Student
                 </th>
                 <th className="px-3 py-3 md:px-6 md:py-4 font-medium">Batch</th>
@@ -230,7 +356,7 @@ export const PaymentList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {filteredStudents.map((student) => {
+              {filteredStudents.map((student, index) => {
                 const status =
                   student.status ||
                   (student.paidAmount >= student.totalAmount &&
@@ -249,7 +375,10 @@ export const PaymentList = () => {
                     key={student.id}
                     className="hover:bg-white/5 transition-colors group"
                   >
-                    <td className="px-3 py-3 md:px-6 md:py-4">
+                    <td className="pl-4 pr-1 py-3 md:pl-6 md:pr-2 md:py-4 text-[10px] font-bold text-slate-400/60 italic text-center">
+                      {index + 1}
+                    </td>
+                    <td className="pl-1 pr-3 py-3 md:pl-2 md:pr-6 md:py-4">
                       <div
                         onClick={() => setViewingStudent(student)}
                         className="flex items-center gap-2 md:gap-3 cursor-pointer group/profile"
@@ -350,9 +479,14 @@ export const PaymentList = () => {
                           </button>
                         )}
                       <button
-                        onClick={() => setInvoiceStudent(student)}
+                        onClick={() => {
+                          setNotificationSent({
+                            name: student.name,
+                            type: "invoice",
+                          });
+                        }}
                         className="p-2 text-slate-400 dark:text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                        title="View Invoice"
+                        title="Send Invoice to Student"
                       >
                         <FileText size={16} />
                       </button>
@@ -419,11 +553,36 @@ export const PaymentList = () => {
         isOpen={!!notificationSent}
         onClose={() => setNotificationSent(null)}
         onConfirm={() => setNotificationSent(null)}
-        title="Notification Sent"
-        message={`Success! A notification has been sent to ${notificationSent?.name} regarding their pending balance of ₹${notificationSent?.amount}.`}
+        title={
+          notificationSent?.isBulk
+            ? "Bulk Operation Complete"
+            : "Notification Sent"
+        }
+        message={
+          notificationSent?.isBulk
+            ? `Success! WhatsApp API has successfully distributed ${notificationSent.amount} to ${notificationSent.name}.`
+            : notificationSent?.type === "invoice"
+            ? `Success! The digital invoice has been sent to ${notificationSent?.name} successfully.`
+            : `Success! A fee reminder has been sent to ${notificationSent?.name} regarding their pending balance of ₹${notificationSent?.amount}.`
+        }
         confirmText="Got it"
         variant="success"
         showCancel={false}
+      />
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={confirmModalAction}
+        title={confirmModalTitle}
+        message={confirmModalMessage}
+        confirmText={bulkActionType === "empty" ? "Got it" : "Yes, Send Now"}
+        variant={
+          bulkActionType === "empty" || bulkActionType === "reminder"
+            ? "warning"
+            : "primary"
+        }
+        showCancel={bulkActionType !== "empty"}
       />
 
       {invoiceStudent && (

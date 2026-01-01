@@ -23,6 +23,15 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         console.log('Creating student:', req.body);
+
+        // Seat occupancy check
+        if (req.body.seatNumber && req.body.seatNumber > 0) {
+            const existingSeat = await Student.findOne({ seatNumber: req.body.seatNumber });
+            if (existingSeat) {
+                return res.status(400).json({ message: `Seat ${req.body.seatNumber} is already occupied by ${existingSeat.name}` });
+            }
+        }
+
         const newStudent = new Student(req.body);
         const savedStudent = await newStudent.save();
         res.status(201).json({ ...savedStudent._doc, id: savedStudent._id });
@@ -36,9 +45,18 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         console.log('Updating student ID:', req.params.id, 'Data:', req.body);
-        if (req.body.seatNumber !== undefined) {
-            console.log('Received seatNumber:', req.body.seatNumber);
+
+        // Seat occupancy check
+        if (req.body.seatNumber && req.body.seatNumber > 0) {
+            const existingSeat = await Student.findOne({
+                seatNumber: req.body.seatNumber,
+                _id: { $ne: req.params.id } // Exclude current student
+            });
+            if (existingSeat) {
+                return res.status(400).json({ message: `Seat ${req.body.seatNumber} is already occupied by ${existingSeat.name}` });
+            }
         }
+
         const updatedStudent = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,

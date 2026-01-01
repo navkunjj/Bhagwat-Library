@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Save, Edit2, Camera, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
-import { saveStudent, getBatches } from "../utils/store";
+import { saveStudent, getBatches, getStudents } from "../utils/store";
 import { CameraCapture } from "./CameraCapture";
 
 export const StudentForm = ({
@@ -11,13 +11,19 @@ export const StudentForm = ({
   mode = "personal",
 }) => {
   const [batches, setBatches] = React.useState([]);
+  const [allStudents, setAllStudents] = React.useState([]);
   const [isCameraOpen, setIsCameraOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Load batches first
+  // Load batches and occupied seats first
   React.useEffect(() => {
     const load = async () => {
-      setBatches(await getBatches());
+      const [batchData, studentData] = await Promise.all([
+        getBatches(),
+        getStudents(),
+      ]);
+      setBatches(batchData);
+      setAllStudents(studentData);
     };
     load();
   }, []);
@@ -33,7 +39,7 @@ export const StudentForm = ({
     address: student?.address || "",
     admissionDate:
       student?.admissionDate || new Date().toISOString().split("T")[0],
-    paidAmount: student?.paidAmount || "",
+    paidAmount: student?.id ? student?.paidAmount ?? 0 : 0, // Default to 0 for new students
     totalAmount: student?.totalAmount || "",
     status: student?.status || "Unpaid",
     photo: student?.photo || "",
@@ -340,21 +346,39 @@ export const StudentForm = ({
                 </button>
 
                 {/* 1 to 100 */}
-                {Array.from({ length: 100 }, (_, i) => i + 1).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, seatNumber: n })}
-                    className={clsx(
-                      "flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
-                      formData.seatNumber === n
-                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110 font-bold"
-                        : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50"
-                    )}
-                  >
-                    {n}
-                  </button>
-                ))}
+                {Array.from({ length: 100 }, (_, i) => i + 1).map((n) => {
+                  const occupant = allStudents.find(
+                    (s) => s.seatNumber === n && s.id !== student?.id
+                  );
+                  const isOccupied = !!occupant;
+
+                  return (
+                    <div key={n} className="flex-shrink-0 relative group/seat">
+                      <button
+                        type="button"
+                        disabled={isOccupied}
+                        onClick={() =>
+                          setFormData({ ...formData, seatNumber: n })
+                        }
+                        className={clsx(
+                          "w-12 h-12 rounded-xl border flex items-center justify-center transition-all snap-center",
+                          formData.seatNumber === n
+                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-110 font-bold"
+                            : isOccupied
+                            ? "bg-danger/20 border-danger/30 text-danger cursor-not-allowed"
+                            : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-primary/50"
+                        )}
+                      >
+                        {n}
+                      </button>
+                      {isOccupied && (
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/seat:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-xl">
+                          Occupied by {occupant.name}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Fade masks */}
@@ -363,7 +387,9 @@ export const StudentForm = ({
             </div>
 
             <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-2 text-center italic">
-              ← Scroll to choose a seat →
+              {allStudents.length > 0
+                ? "← Scroll to choose a seat (Red = Occupied) →"
+                : "Loading seats..."}
             </p>
           </div>
 
