@@ -62,9 +62,14 @@ router.put('/:id', async (req, res) => {
             req.body,
             { new: true }
         );
-        if (!updatedStudent) return res.status(404).json({ message: 'Student not found' });
+        if (!updatedStudent) {
+            console.warn(`Update failed: Student not found with ID ${req.params.id}`);
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        console.log('Update success for student:', updatedStudent.name);
         res.json({ ...updatedStudent._doc, id: updatedStudent._id });
     } catch (err) {
+        console.error('Error updating student:', err);
         res.status(400).json({ message: err.message });
     }
 });

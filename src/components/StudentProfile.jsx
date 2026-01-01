@@ -11,6 +11,7 @@ import {
   XCircle,
   Armchair,
   FileText,
+  Loader2,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { updateStudentPayment, calculateValidity } from "../utils/store";
@@ -21,6 +22,14 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
   const [paidAmount, setPaidAmount] = React.useState(student?.paidAmount || 0);
   const [error, setError] = React.useState("");
   const [showInvoice, setShowInvoice] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  // Sync state if student prop changes externally
+  React.useEffect(() => {
+    if (student) {
+      setPaidAmount(student.paidAmount || 0);
+    }
+  }, [student]);
 
   if (!student) return null;
 
@@ -42,12 +51,20 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
     }
 
     // Update payment
-    const updatedStudent = await updateStudentPayment(student.id, amount);
-    if (updatedStudent) {
-      setIsEditingPayment(false);
-      setError("");
-      // Notify parent to refresh data
-      onUpdate?.();
+    setIsSaving(true);
+    try {
+      const updatedStudent = await updateStudentPayment(student.id, amount);
+      if (updatedStudent) {
+        setIsEditingPayment(false);
+        setError("");
+        // Notify parent to refresh data
+        onUpdate?.();
+      }
+    } catch (err) {
+      console.error("Profile: handleSavePayment error:", err);
+      setError(err.message || "Failed to update payment. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -262,10 +279,20 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
                   <div className="flex gap-2">
                     <button
                       onClick={handleSavePayment}
-                      className="flex-1 flex items-center justify-center gap-1 bg-success hover:bg-success/90 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      disabled={isSaving}
+                      className="flex-1 flex items-center justify-center gap-2 bg-success hover:bg-success/90 disabled:opacity-70 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                     >
-                      <Check size={14} />
-                      Save
+                      {isSaving ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check size={14} />
+                          <span>Save</span>
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={handleCancelEdit}

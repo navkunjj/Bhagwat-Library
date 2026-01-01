@@ -3,6 +3,7 @@ import { X, Save, Edit2, Camera, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
 import { saveStudent, getBatches, getStudents } from "../utils/store";
 import { CameraCapture } from "./CameraCapture";
+import { ConfirmModal } from "./ConfirmModal";
 
 export const StudentForm = ({
   student,
@@ -14,6 +15,7 @@ export const StudentForm = ({
   const [allStudents, setAllStudents] = React.useState([]);
   const [isCameraOpen, setIsCameraOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [errorInfo, setErrorInfo] = React.useState(null); // { title: '', message: '', variant: '' }
 
   // Load batches and occupied seats first
   React.useEffect(() => {
@@ -39,8 +41,8 @@ export const StudentForm = ({
     address: student?.address || "",
     admissionDate:
       student?.admissionDate || new Date().toISOString().split("T")[0],
-    paidAmount: student?.id ? student?.paidAmount ?? 0 : 0, // Default to 0 for new students
-    totalAmount: student?.totalAmount || "",
+    paidAmount: student ? student.paidAmount ?? 0 : 0, // Handle existing student with 0 paid
+    totalAmount: student ? student.totalAmount ?? 0 : 0, // Handle 0 or empty
     status: student?.status || "Unpaid",
     photo: student?.photo || "",
     validityFrom: student?.validityFrom || "",
@@ -48,11 +50,10 @@ export const StudentForm = ({
     seatNumber: student?.seatNumber || 0,
   });
 
-  // Calculate total fee based on selected batches
   React.useEffect(() => {
-    if (batches.length > 0) {
-      // If adding new student, total is sum of selected. If editing, we might need to be careful not to overwrite if custom?
-      // For now, simple logic: Total = Sum of selected batches.
+    // Only recalculate total fee if in personal mode (editing batches)
+    // and if we have batches loaded.
+    if (mode === "personal" && batches.length > 0) {
       const selectedBatches = batches.filter((b) =>
         formData.batch.includes(b.time)
       );
@@ -62,7 +63,7 @@ export const StudentForm = ({
       );
       setFormData((prev) => ({ ...prev, totalAmount: total }));
     }
-  }, [formData.batch, batches]);
+  }, [formData.batch, batches, mode]);
 
   // Calculate status dynamically & Auto-set Validity
   React.useEffect(() => {
@@ -132,7 +133,11 @@ export const StudentForm = ({
     const file = e.target.files[0];
     if (file) {
       if (file.size > 500 * 1024) {
-        alert("File size too large. Please select an image under 500KB.");
+        setErrorInfo({
+          title: "File Too Large",
+          message: "Please select an image under 500KB for better performance.",
+          variant: "warning",
+        });
         return;
       }
       const reader = new FileReader();
@@ -159,7 +164,11 @@ export const StudentForm = ({
       onClose();
     } catch (error) {
       console.error("Error saving student:", error);
-      alert("Failed to save student. Please try again.");
+      setErrorInfo({
+        title: "Action Failed",
+        message: error.message || "Failed to save student. Please try again.",
+        variant: "danger",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -541,6 +550,17 @@ export const StudentForm = ({
           onClose={() => setIsCameraOpen(false)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!errorInfo}
+        onClose={() => setErrorInfo(null)}
+        onConfirm={() => setErrorInfo(null)}
+        title={errorInfo?.title}
+        message={errorInfo?.message}
+        variant={errorInfo?.variant || "danger"}
+        confirmText="Got it"
+        showCancel={false}
+      />
     </div>
   );
 };

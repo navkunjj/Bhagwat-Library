@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { X, Printer, Download, Loader2 } from "lucide-react";
 import html2pdf from "html2pdf.js";
+import { clsx } from "clsx";
+import { ConfirmModal } from "./ConfirmModal";
 
 export const Invoice = ({ student, onClose }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [errorInfo, setErrorInfo] = useState(null); // { title: '', message: '', variant: '' }
   if (!student) return null;
 
   const handleDownload = async () => {
@@ -43,7 +46,11 @@ export const Invoice = ({ student, onClose }) => {
       await html2pdf().from(element).set(opt).save();
     } catch (error) {
       console.error("PDF generation failed:", error);
-      alert("Failed to generate PDF. Please try again.");
+      setErrorInfo({
+        title: "Download Failed",
+        message: "Failed to generate PDF. Please try again.",
+        variant: "danger",
+      });
     } finally {
       element.setAttribute("style", originalStyle);
       element.className = originalClassName;
@@ -220,7 +227,7 @@ export const Invoice = ({ student, onClose }) => {
                   </div>
 
                   {/* Payment Table */}
-                  <div className="border border-slate-800">
+                  <div className="border border-slate-800 overflow-hidden">
                     <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-800 px-4 py-2 font-bold text-sm">
                       <div className="col-span-8 uppercase text-xs">
                         Batch Timing / Particulars
@@ -229,16 +236,32 @@ export const Invoice = ({ student, onClose }) => {
                         Amount to Pay
                       </div>
                     </div>
-                    <div className="grid grid-cols-12 px-4 py-8 border-b border-slate-100">
-                      <div className="col-span-8">
-                        <p className="font-bold uppercase text-lg">
+                    {/* Particulars Row - Fixed Stable Height */}
+                    <div className="grid grid-cols-12 px-4 border-b border-slate-100 min-h-[100px] items-center">
+                      <div className="col-span-8 py-4">
+                        <p
+                          className={clsx(
+                            "font-bold uppercase tracking-tight",
+                            (Array.isArray(student.batch)
+                              ? student.batch.join(", ")
+                              : student.batch || ""
+                            ).length > 60
+                              ? "text-xs"
+                              : (Array.isArray(student.batch)
+                                  ? student.batch.join(", ")
+                                  : student.batch || ""
+                                ).length > 30
+                              ? "text-sm"
+                              : "text-lg"
+                          )}
+                        >
                           {Array.isArray(student.batch)
                             ? student.batch.join(", ")
                             : student.batch}
                         </p>
                       </div>
-                      <div className="col-span-4 text-right self-center">
-                        <span className="font-bold text-2xl font-mono">
+                      <div className="col-span-4 text-right py-4">
+                        <span className="font-bold text-2xl font-mono whitespace-nowrap">
                           ₹{student.totalAmount}.00
                         </span>
                       </div>
@@ -337,6 +360,17 @@ export const Invoice = ({ student, onClose }) => {
           }
         }
       `}</style>
+
+      <ConfirmModal
+        isOpen={!!errorInfo}
+        onClose={() => setErrorInfo(null)}
+        onConfirm={() => setErrorInfo(null)}
+        title={errorInfo?.title}
+        message={errorInfo?.message}
+        variant={errorInfo?.variant || "danger"}
+        confirmText="Got it"
+        showCancel={false}
+      />
     </div>
   );
 };

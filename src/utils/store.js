@@ -92,7 +92,10 @@ export const saveStudent = async (student) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(student)
             });
-            if (!res.ok) throw new Error('Failed to update student');
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Failed to update student');
+            }
             return await res.json();
         } else {
             // Create
@@ -101,12 +104,15 @@ export const saveStudent = async (student) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(student)
             });
-            if (!res.ok) throw new Error('Failed to create student');
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Failed to create student');
+            }
             return await res.json();
         }
     } catch (err) {
-        console.error(err);
-        return null;
+        console.error('Store: saveStudent error:', err);
+        throw err; // Throw error to be caught by UI
     }
 };
 
@@ -125,34 +131,14 @@ export const updateStudentPayment = async (id, paidAmount) => {
         // But our backend PUT blindly updates.
         // It's better to fetch-update-save or send partial update.
         // Let's modify the student object locally and send PUT.
-        // Wait, 'updateStudentPayment' in store.js handled status logic.
-        // We should move that logic to the caller or replicate it here by fetching first.
-
-        // Fetch current student to get totalAmount
-        // Note: This is an extra round trip. 
-        // Optimization: Backend could handle status update logic in PUT or a specific endpoint.
-        // For now, let's keep logic here to match frontend app structure.
-
-        // Actually, we can just send the paidAmount and status (calculated here or frontend).
-        // BUT we need totalAmount to calculate status.
-        // We can fetch student list or single student.
-        // Let's assuming we just call saveStudent with the full object if we have it?
-        // The original store.js `updateStudentPayment` took (id, paidAmount).
-
-        // Let's implement specific logic:
-        // 1. Get all students (cached or fresh) - expensive?
-        // 2. Find student.
-        // 3. Update.
-        // 4. PUT.
-
         const students = await getStudents();
         const student = students.find(s => s.id === id);
 
         if (student) {
-            student.paidAmount = paidAmount;
-            if (paidAmount >= student.totalAmount) {
+            student.paidAmount = Number(paidAmount);
+            if (student.paidAmount >= student.totalAmount) {
                 student.status = 'Paid';
-            } else if (paidAmount > 0) {
+            } else if (student.paidAmount > 0) {
                 student.status = 'Partial';
             } else {
                 student.status = 'Unpaid';
@@ -160,10 +146,10 @@ export const updateStudentPayment = async (id, paidAmount) => {
             // Send update
             return await saveStudent(student);
         }
-        return null;
+        throw new Error('Student not found for payment update');
     } catch (err) {
-        console.error(err);
-        return null;
+        console.error('Store: updateStudentPayment error:', err);
+        throw err;
     }
 };
 
