@@ -85,7 +85,9 @@ export const PaymentList = () => {
         ? students.filter(
             (s) => s.paidAmount < s.totalAmount && s.totalAmount > 0
           )
-        : students.filter((s) => s.totalAmount > 0);
+        : students.filter(
+            (s) => s.paidAmount >= s.totalAmount && s.totalAmount > 0
+          );
 
     if (studentsToNotify.length === 0) {
       setBulkActionType("empty");
@@ -478,18 +480,20 @@ export const PaymentList = () => {
                             <Bell size={16} />
                           </button>
                         )}
-                      <button
-                        onClick={() => {
-                          setNotificationSent({
-                            name: student.name,
-                            type: "invoice",
-                          });
-                        }}
-                        className="p-2 text-slate-400 dark:text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                        title="Send Invoice to Student"
-                      >
-                        <FileText size={16} />
-                      </button>
+                      {status === "Paid" && (
+                        <button
+                          onClick={() => {
+                            setNotificationSent({
+                              name: student.name,
+                              type: "invoice",
+                            });
+                          }}
+                          className="p-2 text-slate-400 dark:text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                          title="Send Invoice to Student"
+                        >
+                          <FileText size={16} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );

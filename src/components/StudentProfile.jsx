@@ -65,13 +65,16 @@ export const StudentProfile = ({ student, onClose, onUpdate, onEdit }) => {
         {/* Header */}
         <div className="relative">
           <div className="absolute top-4 right-4 z-10 flex gap-2">
-            <button
-              onClick={() => setShowInvoice(true)}
-              className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
-              title="View Invoice"
-            >
-              <FileText size={20} />
-            </button>
+            {student.paidAmount >= student.totalAmount &&
+              student.totalAmount > 0 && (
+                <button
+                  onClick={() => setShowInvoice(true)}
+                  className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+                  title="View Invoice"
+                >
+                  <FileText size={20} />
+                </button>
+              )}
             <button
               onClick={onEdit}
               className="p-2 bg-black/10 dark:bg-black/20 hover:bg-black/30 dark:hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
